@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../context/LanguageContext';
 import { AlertCircle, ArrowLeft, CheckCircle2, ShieldCheck, X } from 'lucide-react';
 
 interface Package {
@@ -25,6 +26,7 @@ interface Game {
 export const GameDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { token } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [game, setGame] = useState<Game | null>(null);
@@ -121,16 +123,16 @@ export const GameDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 animate-pulse">
-        <div className="h-64 bg-dark-800 rounded-3xl mb-8" />
+      <div className="max-w-7xl mx-auto px-4 py-16 animate-pulse transition-colors duration-300">
+        <div className="h-64 bg-slate-200 dark:bg-dark-800 rounded-3xl mb-8" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-4">
-            <div className="h-8 bg-dark-800 rounded w-1/2" />
-            <div className="h-24 bg-dark-800 rounded w-full" />
+            <div className="h-8 bg-slate-200 dark:bg-dark-800 rounded w-1/2" />
+            <div className="h-24 bg-slate-200 dark:bg-dark-800 rounded w-full" />
           </div>
           <div className="lg:col-span-2 space-y-6">
-            <div className="h-48 bg-dark-800 rounded-2xl" />
-            <div className="h-48 bg-dark-800 rounded-2xl" />
+            <div className="h-48 bg-slate-200 dark:bg-dark-800 rounded-2xl" />
+            <div className="h-48 bg-slate-200 dark:bg-dark-800 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -141,15 +143,15 @@ export const GameDetail: React.FC = () => {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center">
         <div className="flex items-center justify-center p-8 glass-card rounded-2xl border-red-500/20 gap-4 mb-6">
-          <AlertCircle className="text-red-400 shrink-0" size={32} />
+          <AlertCircle className="text-red-500 dark:text-red-400 shrink-0" size={32} />
           <div className="text-left">
-            <h3 className="font-bold text-white">Oops! Error loading game</h3>
-            <p className="text-sm text-slate-400 mt-1">{error}</p>
+            <h3 className="font-extrabold text-slate-800 dark:text-white">Oops! Error loading game</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{error}</p>
           </div>
         </div>
         <button
           onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-dark-800 hover:bg-dark-700 text-slate-200 hover:text-white rounded-xl transition-all"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-dark-800 dark:hover:bg-dark-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all cursor-pointer border border-slate-200 dark:border-transparent font-bold text-sm"
         >
           <ArrowLeft size={16} /> Back to Home
         </button>
@@ -158,17 +160,18 @@ export const GameDetail: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="relative h-64 sm:h-80 rounded-3xl overflow-hidden mb-8 border border-dark-800 shadow-2xl">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
+      {/* Banner Cover */}
+      <div className="relative h-64 sm:h-80 rounded-3xl overflow-hidden mb-8 border border-slate-200 dark:border-dark-800 shadow-2xl transition-colors duration-300">
         <img src={game.bannerUrl} alt={game.name} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 dark:from-dark-950 via-slate-900/20 dark:via-dark-950/40 to-transparent" />
         
         <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row sm:items-end gap-4">
-          <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden border-2 border-primary-500/50 shadow-lg bg-dark-900">
+          <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden border-2 border-primary-500/50 shadow-lg bg-slate-100 dark:bg-dark-900">
             <img src={game.thumbnailUrl} alt={game.name} className="w-full h-full object-cover" />
           </div>
           <div>
-            <span className="px-2 py-0.5 text-[10px] font-bold tracking-widest text-primary-400 bg-primary-500/10 border border-primary-500/20 rounded uppercase">
+            <span className="px-2 py-0.5 text-[10px] font-extrabold tracking-widest text-primary-600 dark:text-primary-400 bg-primary-500/10 border border-primary-500/20 rounded uppercase">
               {game.category}
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">{game.name}</h1>
@@ -177,72 +180,86 @@ export const GameDetail: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* About Game Sidebar */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="glass-card rounded-2xl border border-dark-800 p-6">
-            <h3 className="font-bold text-lg text-slate-100 mb-3">About this game</h3>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 bg-white/40 dark:bg-transparent">
+            <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100 mb-3">
+              {t('aboutGame')}
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
               {game.description || 'Top-up your account easily and instantly. Fast, safe, and secure transaction.'}
             </p>
-            <div className="space-y-4 pt-4 border-t border-dark-800 text-xs text-slate-400">
+            <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-dark-800 text-xs text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="text-primary-500" size={14} />
-                <span>Instant delivery to game account</span>
+                <span>{t('instantDelivery')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="text-primary-500" size={14} />
-                <span>Official game top-up partner code</span>
+                <span>{t('officialPartner')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="text-primary-500" size={14} />
-                <span>24/7 client support assistance</span>
+                <span>{t('support247')}</span>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Top-up Form Panel */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-card rounded-2xl border border-dark-800 p-6 relative">
-            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-bold text-sm text-white">
+          {/* Step 1: User ID */}
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 relative bg-white/40 dark:bg-transparent">
+            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-black text-sm text-white">
               1
             </div>
             <div className="pl-12">
-              <h3 className="font-bold text-lg text-white mb-4">Enter User Details</h3>
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-white mb-4">
+                {t('enterDetails')}
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-slate-400 font-semibold mb-2">User ID</label>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 font-bold mb-2 uppercase tracking-wide">
+                    {t('userId')}
+                  </label>
                   <input
                     type="text"
                     value={gameUserId}
                     onChange={(e) => setGameUserId(e.target.value)}
                     placeholder="Enter Game User ID"
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
                   />
                 </div>
                 {isMLBB && (
                   <div>
-                    <label className="block text-xs text-slate-400 font-semibold mb-2">Zone ID</label>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 font-bold mb-2 uppercase tracking-wide">
+                      {t('zoneId')}
+                    </label>
                     <input
                       type="text"
                       value={zoneId}
                       onChange={(e) => setZoneId(e.target.value)}
                       placeholder="e.g. 1234"
-                      className="w-full px-4 py-3 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
                     />
                   </div>
                 )}
               </div>
-              <p className="text-[10px] text-slate-500 mt-3 leading-relaxed">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-3 leading-relaxed">
                 To find your User ID, log into your game client, tap your profile icon at the top left. The User ID is displayed on the main profile dashboard.
               </p>
             </div>
           </div>
 
-          <div className="glass-card rounded-2xl border border-dark-800 p-6 relative">
-            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-bold text-sm text-white">
+          {/* Step 2: Select Package */}
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 relative bg-white/40 dark:bg-transparent">
+            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-black text-sm text-white">
               2
             </div>
             <div className="pl-12">
-              <h3 className="font-bold text-lg text-white mb-4">Select Recharge Item</h3>
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-white mb-4">
+                {t('selectPackage')}
+              </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {game.packages.map((pkg) => (
                   <button
@@ -251,17 +268,21 @@ export const GameDetail: React.FC = () => {
                     className={`p-4 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between h-24 ${
                       selectedPackage?.id === pkg.id
                         ? 'bg-primary-500/10 border-primary-500 shadow-lg shadow-primary-500/5'
-                        : 'bg-dark-900 border-dark-800 hover:border-dark-700'
+                        : 'bg-slate-50 dark:bg-dark-900 border-slate-200 dark:border-dark-800 hover:border-slate-300 dark:hover:border-dark-700'
                     }`}
                   >
-                    <span className="font-bold text-sm text-slate-200 line-clamp-1">{pkg.name}</span>
+                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 line-clamp-1">
+                      {pkg.name}
+                    </span>
                     <div className="mt-2 text-right">
                       {pkg.originalPrice && (
-                        <span className="text-[10px] text-slate-500 line-through mr-1.5 block">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 line-through mr-1.5 block">
                           ${Number(pkg.originalPrice).toFixed(2)}
                         </span>
                       )}
-                      <span className="font-extrabold text-sm text-primary-400">${Number(pkg.price).toFixed(2)}</span>
+                      <span className="font-extrabold text-sm text-primary-500 dark:text-primary-400">
+                        ${Number(pkg.price).toFixed(2)}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -269,12 +290,15 @@ export const GameDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className="glass-card rounded-2xl border border-dark-800 p-6 relative">
-            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-bold text-sm text-white">
+          {/* Step 3: Payment Method */}
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 relative bg-white/40 dark:bg-transparent">
+            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-black text-sm text-white">
               3
             </div>
             <div className="pl-12">
-              <h3 className="font-bold text-lg text-white mb-4">Select Payment Method</h3>
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-white mb-4">
+                {t('selectPayment')}
+              </h3>
               <div className="space-y-3">
                 {[
                   { id: 'E-Wallet', name: 'WavePay / KBZPay / MytelPay', fee: 'No fee', icon: '📱' },
@@ -287,17 +311,19 @@ export const GameDetail: React.FC = () => {
                     className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
                       selectedPayment === payment.id
                         ? 'bg-primary-500/10 border-primary-500'
-                        : 'bg-dark-900 border-dark-800 hover:border-dark-700'
+                        : 'bg-slate-50 dark:bg-dark-900 border-slate-200 dark:border-dark-800 hover:border-slate-300 dark:hover:border-dark-700'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{payment.icon}</span>
                       <div className="text-left">
-                        <span className="font-bold text-sm text-slate-200 block">{payment.name}</span>
-                        <span className="text-[10px] text-slate-500">{payment.fee}</span>
+                        <span className="font-bold text-sm text-slate-800 dark:text-slate-200 block">
+                          {payment.name}
+                        </span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{payment.fee}</span>
                       </div>
                     </div>
-                    <div className="w-5 h-5 rounded-full border border-dark-700 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full border border-slate-300 dark:border-dark-700 flex items-center justify-center">
                       {selectedPayment === payment.id && <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />}
                     </div>
                   </button>
@@ -306,14 +332,17 @@ export const GameDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className="glass-card rounded-2xl border border-dark-800 p-6 relative">
-            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-bold text-sm text-white">
+          {/* Step 4: Complete */}
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 relative bg-white/40 dark:bg-transparent">
+            <div className="absolute top-6 left-6 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center font-black text-sm text-white">
               4
             </div>
             <div className="pl-12">
-              <h3 className="font-bold text-lg text-white mb-4">Complete Purchase</h3>
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-white mb-4">
+                {t('payNow')}
+              </h3>
               {formError && (
-                <div className="flex items-center gap-3 p-4 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <div className="flex items-center gap-3 p-4 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-sm">
                   <AlertCircle className="shrink-0" size={16} />
                   <span>{formError}</span>
                 </div>
@@ -322,67 +351,71 @@ export const GameDetail: React.FC = () => {
                 onClick={handleBuyClick}
                 className="w-full py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-extrabold rounded-xl shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all cursor-pointer text-center text-sm uppercase tracking-wider"
               >
-                Buy Now
+                {t('payNow')}
               </button>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-dark-950/80 backdrop-blur-sm">
-          <div className="glass-card rounded-3xl border border-dark-800 max-w-md w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-dark-800 flex justify-between items-center bg-dark-900/50">
-              <h3 className="font-extrabold text-white text-lg flex items-center gap-2">
-                <ShieldCheck className="text-primary-400" size={20} />
-                Order Confirmation
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/60 dark:bg-dark-950/80 backdrop-blur-sm">
+          <div className="glass-card rounded-3xl border border-slate-200 dark:border-dark-800 max-w-md w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 bg-white dark:bg-dark-900/95">
+            <div className="p-6 border-b border-slate-200 dark:border-dark-800 flex justify-between items-center bg-slate-50 dark:bg-dark-900/50">
+              <h3 className="font-extrabold text-slate-800 dark:text-white text-lg flex items-center gap-2">
+                <ShieldCheck className="text-primary-500 dark:text-primary-400" size={20} />
+                {t('confirmDetails')}
               </h3>
-              <button onClick={() => setShowConfirmModal(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+              <button 
+                onClick={() => setShowConfirmModal(false)} 
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer"
+              >
                 <X size={18} />
               </button>
             </div>
             
-            <div className="p-6 space-y-4 text-sm text-slate-300">
-              <p className="text-xs text-slate-400 leading-relaxed mb-2">
-                Please verify details below. Ensure Game User ID and server zone are correct. Top-up transfers are irreversible.
+            <div className="p-6 space-y-4 text-sm text-slate-600 dark:text-slate-300">
+              <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed mb-2">
+                {t('confirmPrompt')}
               </p>
               
-              <div className="bg-dark-900 rounded-xl p-4 border border-dark-800 space-y-2.5">
+              <div className="bg-slate-50 dark:bg-dark-900 rounded-xl p-4 border border-slate-200 dark:border-dark-800 space-y-2.5">
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Game Client</span>
-                  <span className="font-semibold text-slate-200">{game.name}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('gameLabel')}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{game.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">User ID</span>
-                  <span className="font-mono font-bold text-primary-400">{gameUserId}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('userId')}</span>
+                  <span className="font-mono font-bold text-primary-600 dark:text-primary-400">{gameUserId}</span>
                 </div>
                 {isMLBB && (
                   <div className="flex justify-between">
-                    <span className="text-xs text-slate-500">Zone ID</span>
-                    <span className="font-mono font-bold text-slate-200">({zoneId})</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">{t('zoneId')}</span>
+                    <span className="font-mono font-bold text-slate-700 dark:text-slate-200">({zoneId})</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Product Package</span>
-                  <span className="font-semibold text-slate-200">{selectedPackage?.name}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('packageLabel')}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedPackage?.name}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-dark-800">
-                  <span className="text-xs text-slate-500">Payment Gateway</span>
-                  <span className="font-semibold text-slate-200">{selectedPayment}</span>
+                <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-dark-800">
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('paymentMethod')}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedPayment}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500 font-bold">Total Bill</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">{t('totalPrice')}</span>
                   <span className="font-extrabold text-primary-500 text-base">${Number(selectedPackage?.price).toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 border-t border-dark-800 flex gap-3 bg-dark-900/20">
+            <div className="p-6 border-t border-slate-200 dark:border-dark-800 flex gap-3 bg-slate-50 dark:bg-dark-900/20">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="flex-1 py-3 bg-dark-800 hover:bg-dark-700 border border-dark-800 hover:border-dark-700 text-slate-300 font-semibold rounded-xl transition-all cursor-pointer text-center text-xs"
+                className="flex-1 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-dark-800 dark:hover:bg-dark-700 text-slate-600 dark:text-slate-300 font-semibold rounded-xl transition-all cursor-pointer text-center text-xs"
               >
-                Cancel
+                {t('cancelBtn')}
               </button>
               <button
                 onClick={handleConfirmPurchase}
@@ -392,7 +425,7 @@ export const GameDetail: React.FC = () => {
                 {checkoutLoading ? (
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  'Confirm & Buy'
+                  t('confirmBtn')
                 )}
               </button>
             </div>
@@ -400,51 +433,56 @@ export const GameDetail: React.FC = () => {
         </div>
       )}
 
+      {/* Success Modal (Receipt) */}
       {checkoutSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-dark-950/80 backdrop-blur-sm">
-          <div className="glass-card rounded-3xl border border-dark-800 max-w-md w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 text-center border-b border-dark-800 bg-dark-900/50">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-emerald-400">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/60 dark:bg-dark-950/80 backdrop-blur-sm">
+          <div className="glass-card rounded-3xl border border-slate-200 dark:border-dark-800 max-w-md w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 bg-white dark:bg-dark-900/95">
+            <div className="p-6 text-center border-b border-slate-200 dark:border-dark-800 bg-slate-50 dark:bg-dark-900/50">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-emerald-500 dark:text-emerald-400">
                 <CheckCircle2 size={24} />
               </div>
-              <h3 className="font-extrabold text-white text-lg">Top-Up Successful!</h3>
-              <p className="text-slate-400 text-xs mt-1">Your diamonds have been transferred</p>
+              <h3 className="font-extrabold text-slate-800 dark:text-white text-lg">
+                {t('paymentSuccess')}
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">
+                {t('receiptPrompt')}
+              </p>
             </div>
 
-            <div className="p-6 space-y-4 text-sm text-slate-300">
-              <div className="bg-dark-900 rounded-xl p-4 border border-dark-800 space-y-2.5">
+            <div className="p-6 space-y-4 text-sm text-slate-600 dark:text-slate-300">
+              <div className="bg-slate-50 dark:bg-dark-900 rounded-xl p-4 border border-slate-200 dark:border-dark-800 space-y-2.5">
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Transaction ID</span>
-                  <span className="font-mono text-slate-200 text-xs">{checkoutSuccess.orderNumber}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('receiptNo')}</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-200 text-xs">{checkoutSuccess.orderNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Recipient ID</span>
-                  <span className="font-mono font-semibold text-slate-200">
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('recipientId')}</span>
+                  <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
                     {checkoutSuccess.gameUserId} {checkoutSuccess.zoneId ? `(${checkoutSuccess.zoneId})` : ''}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Package Delivered</span>
-                  <span className="font-semibold text-primary-400">{checkoutSuccess.itemPackage?.name}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('packageLabel')}</span>
+                  <span className="font-semibold text-primary-600 dark:text-primary-400">{checkoutSuccess.itemPackage?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Payment Channel</span>
-                  <span className="font-semibold text-slate-200">{checkoutSuccess.paymentMethod}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('paymentMethod')}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{checkoutSuccess.paymentMethod}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500 font-bold">Total Paid</span>
-                  <span className="font-extrabold text-emerald-400 text-base">${Number(checkoutSuccess.amountPaid).toFixed(2)}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">{t('totalPrice')}</span>
+                  <span className="font-extrabold text-emerald-500 dark:text-emerald-400 text-base">${Number(checkoutSuccess.amountPaid).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-slate-500">Status</span>
-                  <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('statusLabel')}</span>
+                  <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
                     {checkoutSuccess.status}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 border-t border-dark-800 bg-dark-900/20 text-center">
+            <div className="p-6 border-t border-slate-200 dark:border-dark-800 bg-slate-50 dark:bg-dark-900/20 text-center">
               <button
                 onClick={() => {
                   setCheckoutSuccess(null);
@@ -455,7 +493,7 @@ export const GameDetail: React.FC = () => {
                 }}
                 className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl transition-all cursor-pointer text-xs uppercase tracking-wider"
               >
-                Close Receipt
+                {t('doneBtn')}
               </button>
             </div>
           </div>

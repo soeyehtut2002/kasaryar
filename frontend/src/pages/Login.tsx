@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../context/LanguageContext';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { login, user, error: authError, setError } = useAuth();
+  const { t } = useLanguage();
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,15 +41,19 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto px-4 py-16 flex flex-col justify-center min-h-[calc(100vh-16rem)]">
-      <div className="glass-card rounded-3xl border border-dark-800 p-8 shadow-2xl">
+    <div className="max-w-md w-full mx-auto px-4 py-16 flex flex-col justify-center min-h-[calc(100vh-16rem)] transition-colors duration-300">
+      <div className="glass-card rounded-3xl border border-slate-200 dark:border-dark-800 p-8 shadow-2xl bg-white/40 dark:bg-transparent">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-white">Welcome Back</h2>
-          <p className="text-slate-400 text-sm mt-2">Sign in to your KasarYar account</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">
+            {t('welcomeBack')}
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
+            {t('signInAccount')}
+          </p>
         </div>
 
         {(error || authError) && (
-          <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-sm">
             <AlertCircle className="shrink-0" size={16} />
             <span>{error || authError}</span>
           </div>
@@ -55,11 +61,11 @@ export const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Email or Username
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">
+              {t('usernameLabel')} / {t('emailLabel')}
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 dark:text-slate-500 pointer-events-none">
                 <Mail size={16} />
               </span>
               <input
@@ -67,18 +73,18 @@ export const Login: React.FC = () => {
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}
                 placeholder="enter email or username"
-                className="block w-full pl-11 pr-4 py-3 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                className="block w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Password
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">
+              {t('passwordLabel')}
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 dark:text-slate-500 pointer-events-none">
                 <Lock size={16} />
               </span>
               <input
@@ -86,7 +92,7 @@ export const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="block w-full pl-11 pr-4 py-3 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                className="block w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
                 required
               />
             </div>
@@ -102,17 +108,17 @@ export const Login: React.FC = () => {
             ) : (
               <>
                 <LogIn size={18} />
-                Sign In
+                {t('signIn')}
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-dark-800 text-center">
-          <p className="text-sm text-slate-400">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary-400 hover:text-primary-500 font-semibold transition-colors">
-              Sign up free
+        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-dark-800 text-center">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t('dontHaveAccount')}{' '}
+            <Link to="/register" className="text-primary-500 dark:text-primary-400 hover:text-primary-600 dark:hover:text-primary-500 font-bold transition-colors">
+              {t('signUpFree')}
             </Link>
           </p>
         </div>

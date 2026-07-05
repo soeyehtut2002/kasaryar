@@ -3,39 +3,74 @@
 @tailwind utilities;
 
 @layer utilities {
-  .glass-card {
+  /* Dark Mode Glass Card */
+  .dark .glass-card {
     background: rgba(22, 27, 38, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
   
-  .glass-card-hover {
+  .dark .glass-card-hover {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  .glass-card-hover:hover {
+  .dark .glass-card-hover:hover {
     background: rgba(22, 27, 38, 0.6);
     border-color: rgba(255, 85, 0, 0.3);
     box-shadow: 0 10px 30px -10px rgba(255, 85, 0, 0.15);
     transform: translateY(-2px);
   }
+
+  /* Light Mode Glass Card */
+  .light .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .light .glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .light .glass-card-hover:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 85, 0, 0.4);
+    box-shadow: 0 10px 30px -10px rgba(255, 85, 0, 0.20);
+    transform: translateY(-2px);
+  }
 }
 
+/* Scrollbar styling adapting to dark/light */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: #07090e;
 }
 
-::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #161b26;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #2d394d;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

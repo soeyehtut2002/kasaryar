@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, ShieldAlert, Calendar, History, ShoppingBag, Loader2 } from 'lucide-react';
 
@@ -24,6 +25,7 @@ interface Order {
 
 export const UserDashboard: React.FC = () => {
   const { user, token, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState<Order[]>([]);
@@ -72,101 +74,117 @@ export const UserDashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="glass-card rounded-3xl border border-dark-800 p-6 sm:p-8 mb-8 relative overflow-hidden shadow-xl">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
+      {/* Profile Header */}
+      <div className="glass-card rounded-3xl border border-slate-200 dark:border-dark-800 p-6 sm:p-8 mb-8 relative overflow-hidden shadow-xl bg-white/40 dark:bg-transparent">
         <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
         
         <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-          <div className="w-16 h-16 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center text-primary-400">
+          <div className="w-16 h-16 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center text-primary-500 dark:text-primary-400">
             <User size={32} />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Hello, {user?.username}</h1>
-            <p className="text-slate-400 text-sm mt-1 flex items-center gap-1.5">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
+              {t('helloUser')}, {user?.username}
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 flex items-center gap-1.5">
               <Mail size={14} /> {user?.email}
             </p>
           </div>
           <div className="sm:ml-auto flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary-500/10 border border-primary-500/20 text-primary-400 capitalize">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary-500/10 border border-primary-500/20 text-primary-500 dark:text-primary-400 capitalize">
               {user?.role} Account
             </span>
           </div>
         </div>
       </div>
 
+      {/* Transactions Grid */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <History className="text-primary-500" size={20} />
-          <h2 className="text-xl font-bold text-white">Transaction History</h2>
+          <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+            {t('txnHistory')}
+          </h2>
         </div>
 
         {error && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-sm">
             <ShieldAlert className="shrink-0" size={16} />
             <span>{error}</span>
           </div>
         )}
 
         {orders.length === 0 ? (
-          <div className="glass-card rounded-2xl border border-dark-800 p-12 text-center max-w-md mx-auto">
-            <ShoppingBag className="text-slate-600 mx-auto mb-4" size={48} />
-            <h3 className="font-bold text-white text-lg">No transactions yet</h3>
-            <p className="text-slate-400 text-sm mt-1 mb-6">
-              You haven't made any game top-ups yet. Go to the catalog to choose your games!
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-12 text-center max-w-md mx-auto bg-white/40 dark:bg-transparent">
+            <ShoppingBag className="text-slate-400 dark:text-slate-600 mx-auto mb-4" size={48} />
+            <h3 className="font-extrabold text-slate-800 dark:text-white text-lg">
+              {t('noTransactions')}
+            </h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 mb-6">
+              {t('noTxnDesc')}
             </p>
             <button
               onClick={() => navigate('/')}
-              className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl shadow-lg transition-all"
+              className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl shadow-lg transition-all cursor-pointer"
             >
-              Browse Games
+              {t('browseGames')}
             </button>
           </div>
         ) : (
-          <div className="glass-card rounded-2xl border border-dark-800 overflow-hidden shadow-lg">
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 overflow-hidden shadow-lg bg-white/40 dark:bg-transparent">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-dark-900/60 border-b border-dark-800 text-slate-400 font-semibold">
-                    <th className="p-4">Game</th>
-                    <th className="p-4">Order Details</th>
-                    <th className="p-4">Recipient ID</th>
-                    <th className="p-4">Total Price</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Date</th>
+                  <tr className="bg-slate-100 dark:bg-dark-900/60 border-b border-slate-200 dark:border-dark-800 text-slate-500 dark:text-slate-400 font-bold">
+                    <th className="p-4">{t('gameLabel')}</th>
+                    <th className="p-4">Details</th>
+                    <th className="p-4">{t('recipientId')}</th>
+                    <th className="p-4">{t('totalPrice')}</th>
+                    <th className="p-4">{t('statusLabel')}</th>
+                    <th className="p-4">{t('dateLabel')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-800 text-slate-300">
+                <tbody className="divide-y divide-slate-200 dark:divide-dark-800 text-slate-700 dark:text-slate-300">
                   {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-dark-900/30 transition-colors">
+                    <tr key={order.id} className="hover:bg-slate-100/50 dark:hover:bg-dark-900/30 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <img
                             src={order.game.thumbnailUrl}
                             alt={order.game.name}
-                            className="w-10 h-10 rounded-lg object-cover bg-dark-900"
+                            className="w-10 h-10 rounded-lg object-cover bg-slate-200 dark:bg-dark-900"
                           />
-                          <span className="font-bold text-slate-200">{order.game.name}</span>
+                          <span className="font-extrabold text-slate-800 dark:text-slate-200">
+                            {order.game.name}
+                          </span>
                         </div>
                       </td>
                       <td className="p-4">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-slate-100">{order.itemPackage.name}</span>
-                          <span className="text-[10px] text-slate-500 font-mono mt-0.5">{order.orderNumber}</span>
+                          <span className="font-semibold text-slate-800 dark:text-slate-100">
+                            {order.itemPackage.name}
+                          </span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                            {order.orderNumber}
+                          </span>
                         </div>
                       </td>
                       <td className="p-4 font-mono text-xs">
                         {order.gameUserId} {order.zoneId ? `(${order.zoneId})` : ''}
                       </td>
-                      <td className="p-4 font-bold text-primary-400">
+                      <td className="p-4 font-bold text-primary-600 dark:text-primary-400">
                         ${Number(order.amountPaid).toFixed(2)}
-                        <span className="block text-[10px] text-slate-500 font-normal mt-0.5">{order.paymentMethod}</span>
+                        <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">
+                          {order.paymentMethod}
+                        </span>
                       </td>
                       <td className="p-4">
-                        <span className="px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
+                        <span className="px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
                           {order.status}
                         </span>
                       </td>
-                      <td className="p-4 text-xs text-slate-400">
+                      <td className="p-4 text-xs text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-1">
                           <Calendar size={12} />
                           {new Date(order.createdAt).toLocaleDateString(undefined, {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import {
   DollarSign,
@@ -55,6 +56,7 @@ interface DashboardData {
 
 export const AdminDashboard: React.FC = () => {
   const { user, token, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'packages'>('overview');
@@ -266,12 +268,16 @@ export const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-100">Admin Control Center</h1>
-          <p className="text-sm text-slate-400 mt-1">Manage game listings, package tiers and monitor sales.</p>
+          <h1 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100">
+            {t('adminControlCenter')}
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {t('adminControlDesc')}
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -280,35 +286,35 @@ export const AdminDashboard: React.FC = () => {
               setShowGameForm(true);
               setActiveTab('games');
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl text-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-lg shadow-primary-500/10 hover:shadow-primary-500/25"
           >
-            <Plus size={14} /> Add New Game
+            <Plus size={14} /> {t('addNewGame')}
           </button>
           <button
             onClick={() => {
               setShowPackageForm(true);
               setActiveTab('packages');
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-accent-500 hover:bg-accent-600 text-dark-950 font-bold rounded-xl text-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-lg shadow-accent-500/10"
           >
-            <Plus size={14} /> Add Package
+            <Plus size={14} /> {t('addPackage')}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-sm">
           <AlertCircle className="shrink-0" size={16} />
           <span>{error}</span>
         </div>
       )}
 
       {/* Navigation tabs */}
-      <div className="flex border-b border-dark-800 gap-4 mb-8">
+      <div className="flex border-b border-slate-200 dark:border-dark-800 gap-4 mb-8">
         {[
-          { id: 'overview', name: 'Overview Stats', icon: TrendingUp },
-          { id: 'games', name: 'Manage Games', icon: Gamepad2 },
-          { id: 'packages', name: 'Manage Packages', icon: Layers }
+          { id: 'overview', name: t('overviewStats'), icon: TrendingUp },
+          { id: 'games', name: t('manageGames'), icon: Gamepad2 },
+          { id: 'packages', name: t('managePackages'), icon: Layers }
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -317,8 +323,8 @@ export const AdminDashboard: React.FC = () => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 pb-4 px-1 border-b-2 font-semibold text-sm transition-all cursor-pointer ${
                 activeTab === tab.id
-                  ? 'border-primary-500 text-primary-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-primary-500 text-primary-500 dark:text-primary-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               <Icon size={16} />
@@ -334,21 +340,21 @@ export const AdminDashboard: React.FC = () => {
           {/* Stats Widgets */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: 'Total Revenue', val: `$${Number(data.stats.totalRevenue).toFixed(2)}`, desc: 'Completed checkouts', icon: DollarSign, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-              { label: 'Total Transactions', val: data.stats.totalOrders, desc: 'Guest + Member checkout orders', icon: ShoppingBag, color: 'text-primary-400 bg-primary-500/10 border-primary-500/20' },
-              { label: 'Registered Customers', val: data.stats.totalUsers, desc: 'Excluding admin profiles', icon: Users, color: 'text-accent-400 bg-accent-500/10 border-accent-500/20' },
-              { label: 'Active Games', val: data.stats.totalGames, desc: 'Games listing in catalog', icon: Gamepad2, color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' }
+              { label: t('totalRevenue'), val: `$${Number(data.stats.totalRevenue).toFixed(2)}`, desc: 'Completed checkouts', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+              { label: t('totalTxns'), val: data.stats.totalOrders, desc: 'Guest + Member checkout orders', icon: ShoppingBag, color: 'text-primary-500 dark:text-primary-400 bg-primary-500/10 border-primary-500/20' },
+              { label: t('registeredCustomers'), val: data.stats.totalUsers, desc: 'Excluding admin profiles', icon: Users, color: 'text-accent-600 dark:text-accent-400 bg-accent-500/10 border-accent-500/20' },
+              { label: t('activeGames'), val: data.stats.totalGames, desc: 'Games listing in catalog', icon: Gamepad2, color: 'text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20' }
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div key={i} className="glass-card rounded-2xl border border-dark-800 p-5 flex items-center gap-4">
+                <div key={i} className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-5 flex items-center gap-4 bg-white/40 dark:bg-transparent">
                   <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${stat.color}`}>
                     <Icon size={22} />
                   </div>
                   <div>
                     <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">{stat.label}</span>
-                    <span className="text-2xl font-black text-white mt-1 block">{stat.val}</span>
-                    <span className="text-[10px] text-slate-500 mt-1 block">{stat.desc}</span>
+                    <span className="text-2xl font-black text-slate-800 dark:text-white mt-1 block">{stat.val}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">{stat.desc}</span>
                   </div>
                 </div>
               );
@@ -357,17 +363,19 @@ export const AdminDashboard: React.FC = () => {
 
           {/* Latest Orders Table */}
           <div className="space-y-4">
-            <h2 className="text-lg font-bold text-white">Recent Top-Up Transactions</h2>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+              {t('recentTransactions')}
+            </h2>
             {data.latestOrders.length === 0 ? (
-              <div className="glass-card rounded-2xl border border-dark-800 p-8 text-center text-slate-500 text-sm">
+              <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-8 text-center text-slate-500 text-sm bg-white/40 dark:bg-transparent">
                 No transactions recorded yet.
               </div>
             ) : (
-              <div className="glass-card rounded-2xl border border-dark-800 overflow-hidden">
+              <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 overflow-hidden bg-white/40 dark:bg-transparent">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="bg-dark-900/60 border-b border-dark-800 text-slate-400 font-semibold">
+                      <tr className="bg-slate-100 dark:bg-dark-900/60 border-b border-slate-200 dark:border-dark-800 text-slate-500 dark:text-slate-400 font-bold">
                         <th className="p-4">Txn Number</th>
                         <th className="p-4">Customer</th>
                         <th className="p-4">Game Client</th>
@@ -377,29 +385,29 @@ export const AdminDashboard: React.FC = () => {
                         <th className="p-4">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-dark-800 text-slate-300">
+                    <tbody className="divide-y divide-slate-200 dark:divide-dark-800 text-slate-700 dark:text-slate-300">
                       {data.latestOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-dark-900/20 transition-colors">
-                          <td className="p-4 font-mono font-bold text-slate-200">{order.orderNumber}</td>
+                        <tr key={order.id} className="hover:bg-slate-100/50 dark:hover:bg-dark-900/20 transition-colors">
+                          <td className="p-4 font-mono font-bold text-slate-800 dark:text-slate-200">{order.orderNumber}</td>
                           <td className="p-4">
                             {order.user ? (
                               <div className="flex flex-col">
-                                <span className="font-semibold">{order.user.username}</span>
-                                <span className="text-[10px] text-slate-500">{order.user.email}</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{order.user.username}</span>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500">{order.user.email}</span>
                               </div>
                             ) : (
-                              <span className="text-slate-500 italic">Guest Purchaser</span>
+                              <span className="text-slate-400 dark:text-slate-500 italic">Guest Purchaser</span>
                             )}
                           </td>
                           <td className="p-4 font-semibold">{order.game.name}</td>
                           <td className="p-4">{order.itemPackage.name}</td>
                           <td className="p-4 font-mono">{order.gameUserId}</td>
-                          <td className="p-4 font-bold text-primary-400">
+                          <td className="p-4 font-bold text-primary-600 dark:text-primary-400">
                             ${Number(order.amountPaid).toFixed(2)}
-                            <span className="block text-[10px] text-slate-500 font-normal">{order.paymentMethod}</span>
+                            <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">{order.paymentMethod}</span>
                           </td>
                           <td className="p-4">
-                            <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
+                            <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
                               {order.status}
                             </span>
                           </td>
@@ -418,54 +426,60 @@ export const AdminDashboard: React.FC = () => {
       {activeTab === 'games' && (
         <div className="space-y-6">
           {showGameForm && (
-            <div className="glass-card rounded-2xl border border-dark-800 p-6 bg-dark-900/30">
-              <div className="flex justify-between items-center pb-4 mb-6 border-b border-dark-800">
-                <h3 className="font-extrabold text-white text-base">
-                  {isEditingGame ? 'Edit Game Listing' : 'Register New Game Listing'}
+            <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 bg-slate-100 dark:bg-dark-900/30">
+              <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-200 dark:border-dark-800">
+                <h3 className="font-extrabold text-slate-800 dark:text-white text-base">
+                  {isEditingGame ? t('editGameListing') : t('registerNewGame')}
                 </h3>
                 <button
                   onClick={() => {
                     setShowGameForm(false);
                     setIsEditingGame(false);
                   }}
-                  className="text-slate-400 hover:text-white"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
                 >
                   <X size={16} />
                 </button>
               </div>
-              <form onSubmit={handleGameSubmit} className="space-y-4 text-sm text-slate-300">
+              <form onSubmit={handleGameSubmit} className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Game Title</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('gameTitle')}
+                    </label>
                     <input
                       type="text"
                       required
                       value={gameForm.name}
                       onChange={(e) => setGameForm({ ...gameForm, name: e.target.value })}
                       placeholder="e.g. PUBG Mobile"
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Slug URL</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('slugUrl')}
+                    </label>
                     <input
                       type="text"
                       required
                       value={gameForm.slug}
                       onChange={(e) => setGameForm({ ...gameForm, slug: e.target.value })}
                       placeholder="e.g. pubg-mobile"
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Category</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('category')}
+                    </label>
                     <select
                       value={gameForm.category}
                       onChange={(e) => setGameForm({ ...gameForm, category: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primary-500 text-xs"
                     >
                       <option value="Mobile">Mobile</option>
                       <option value="PC">PC</option>
@@ -473,38 +487,44 @@ export const AdminDashboard: React.FC = () => {
                     </select>
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Thumbnail URL</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('thumbnailUrl')}
+                    </label>
                     <input
                       type="url"
                       required
                       value={gameForm.thumbnailUrl}
                       onChange={(e) => setGameForm({ ...gameForm, thumbnailUrl: e.target.value })}
                       placeholder="https://images.unsplash.com/..."
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Banner Header URL</label>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                    {t('bannerUrl')}
+                  </label>
                   <input
                     type="url"
                     required
                     value={gameForm.bannerUrl}
                     onChange={(e) => setGameForm({ ...gameForm, bannerUrl: e.target.value })}
                     placeholder="https://images.unsplash.com/..."
-                    className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                    className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Description</label>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                    {t('description')}
+                  </label>
                   <textarea
                     rows={3}
                     value={gameForm.description}
                     onChange={(e) => setGameForm({ ...gameForm, description: e.target.value })}
                     placeholder="Provide short details about game store..."
-                    className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                    className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                   />
                 </div>
 
@@ -514,29 +534,29 @@ export const AdminDashboard: React.FC = () => {
                     id="isActive"
                     checked={gameForm.isActive}
                     onChange={(e) => setGameForm({ ...gameForm, isActive: e.target.checked })}
-                    className="w-4 h-4 rounded text-primary-500 bg-dark-900 border-dark-800 focus:ring-primary-500"
+                    className="w-4 h-4 rounded text-primary-500 bg-white dark:bg-dark-900 border-slate-200 dark:border-dark-800 focus:ring-primary-500"
                   />
-                  <label htmlFor="isActive" className="text-xs font-semibold text-slate-300">
-                    Active Catalog Listing (renders publicly)
+                  <label htmlFor="isActive" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    {t('activeCatalog')}
                   </label>
                 </div>
 
-                <div className="flex gap-2 justify-end pt-4 border-t border-dark-800">
+                <div className="flex gap-2 justify-end pt-4 border-t border-slate-200 dark:border-dark-800">
                   <button
                     type="button"
                     onClick={() => {
                       setShowGameForm(false);
                       setIsEditingGame(false);
                     }}
-                    className="px-4 py-2 bg-dark-800 hover:bg-dark-700 text-slate-300 rounded-xl text-xs cursor-pointer"
+                    className="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-dark-800 dark:hover:bg-dark-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs cursor-pointer"
                   >
-                    Cancel
+                    {t('cancelBtn')}
                   </button>
                   <button
                     type="submit"
                     className="flex items-center gap-1.5 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl text-xs cursor-pointer"
                   >
-                    <Save size={14} /> {isEditingGame ? 'Save Changes' : 'Publish Game'}
+                    <Save size={14} /> {isEditingGame ? t('saveChanges') : t('publishGame')}
                   </button>
                 </div>
               </form>
@@ -545,40 +565,40 @@ export const AdminDashboard: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {games.map((game) => (
-              <div key={game.id} className="glass-card rounded-2xl border border-dark-800 overflow-hidden shadow flex">
-                <img src={game.thumbnailUrl} alt={game.name} className="w-24 object-cover bg-dark-900 shrink-0" />
+              <div key={game.id} className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 overflow-hidden shadow flex bg-white/40 dark:bg-transparent">
+                <img src={game.thumbnailUrl} alt={game.name} className="w-24 object-cover bg-slate-100 dark:bg-dark-900 shrink-0" />
                 <div className="p-4 flex flex-col justify-between w-full">
                   <div>
                     <div className="flex justify-between items-start gap-2">
-                      <h3 className="font-extrabold text-slate-200 text-sm sm:text-base line-clamp-1">{game.name}</h3>
+                      <h3 className="font-extrabold text-slate-800 dark:text-slate-200 text-sm sm:text-base line-clamp-1">{game.name}</h3>
                       <span className={`px-2 py-0.5 text-[8px] font-bold rounded uppercase shrink-0 ${
-                        game.isActive ? 'text-emerald-400 bg-emerald-500/10' : 'text-red-400 bg-red-500/10'
+                        game.isActive ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10' : 'text-red-500 dark:text-red-400 bg-red-500/10'
                       }`}>
                         {game.isActive ? 'Active' : 'Hidden'}
                       </span>
                     </div>
-                    <span className="text-[10px] text-accent-400 uppercase tracking-widest font-semibold block mt-0.5">
+                    <span className="text-[10px] text-accent-600 dark:text-accent-400 uppercase tracking-widest font-semibold block mt-0.5">
                       {game.category}
                     </span>
-                    <p className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-500 line-clamp-2 mt-2 leading-relaxed">
                       {game.description || 'No store description.'}
                     </p>
                   </div>
-                  <div className="flex justify-between items-center pt-3 border-t border-dark-800/50 mt-4">
+                  <div className="flex justify-between items-center pt-3 border-t border-slate-200 dark:border-dark-800/50 mt-4">
                     <span className="text-[10px] text-slate-400">
                       Packages count: <strong>{game._count?.packages || 0}</strong>
                     </span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEditGameClick(game)}
-                        className="p-1.5 bg-dark-800 hover:bg-dark-700 text-slate-300 hover:text-white rounded transition-colors cursor-pointer"
+                        className="p-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-dark-800 dark:hover:bg-dark-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded transition-colors cursor-pointer"
                         title="Edit Game"
                       >
                         <Edit2 size={12} />
                       </button>
                       <button
                         onClick={() => handleDeleteGame(game.id)}
-                        className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded transition-colors cursor-pointer"
+                        className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 hover:text-red-300 rounded transition-colors cursor-pointer"
                         title="Delete Game"
                       >
                         <Trash2 size={12} />
@@ -596,21 +616,28 @@ export const AdminDashboard: React.FC = () => {
       {activeTab === 'packages' && (
         <div className="space-y-6">
           {showPackageForm && (
-            <div className="glass-card rounded-2xl border border-dark-800 p-6 bg-dark-900/30 max-w-xl mx-auto">
-              <div className="flex justify-between items-center pb-4 mb-6 border-b border-dark-800">
-                <h3 className="font-extrabold text-white text-base">Add New Package Tier</h3>
-                <button onClick={() => setShowPackageForm(false)} className="text-slate-400 hover:text-white">
+            <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-6 bg-slate-100 dark:bg-dark-900/30 max-w-xl mx-auto">
+              <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-200 dark:border-dark-800">
+                <h3 className="font-extrabold text-slate-800 dark:text-white text-base">
+                  {t('addPackageTier')}
+                </h3>
+                <button 
+                  onClick={() => setShowPackageForm(false)} 
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+                >
                   <X size={16} />
                 </button>
               </div>
-              <form onSubmit={handlePackageSubmit} className="space-y-4 text-sm text-slate-300">
+              <form onSubmit={handlePackageSubmit} className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Select Game</label>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                    {t('selectGame')}
+                  </label>
                   <select
                     required
                     value={packageForm.gameId}
                     onChange={(e) => setPackageForm({ ...packageForm, gameId: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 focus:outline-none focus:border-primary-500 text-xs"
+                    className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primary-500 text-xs"
                   >
                     <option value="">-- Choose game listing --</option>
                     {games.map(g => (
@@ -621,32 +648,38 @@ export const AdminDashboard: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Package Name</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('packageName')}
+                    </label>
                     <input
                       type="text"
                       required
                       value={packageForm.name}
                       onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
                       placeholder="e.g. 325 + 25 UC"
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Numeric Value (Diamonds count)</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('numericValue')}
+                    </label>
                     <input
                       type="number"
                       required
                       value={packageForm.diamonds}
                       onChange={(e) => setPackageForm({ ...packageForm, diamonds: e.target.value })}
                       placeholder="e.g. 350"
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Selling Price ($)</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('sellingPrice')}
+                    </label>
                     <input
                       type="number"
                       step="0.01"
@@ -654,35 +687,37 @@ export const AdminDashboard: React.FC = () => {
                       value={packageForm.price}
                       onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
                       placeholder="e.g. 4.99"
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Original Price ($ - Optional)</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
+                      {t('originalPrice')}
+                    </label>
                     <input
                       type="number"
                       step="0.01"
                       value={packageForm.originalPrice}
                       onChange={(e) => setPackageForm({ ...packageForm, originalPrice: e.target.value })}
                       placeholder="e.g. 5.99"
-                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-2 justify-end pt-4 border-t border-dark-800">
+                <div className="flex gap-2 justify-end pt-4 border-t border-slate-200 dark:border-dark-800">
                   <button
                     type="button"
                     onClick={() => setShowPackageForm(false)}
-                    className="px-4 py-2 bg-dark-800 hover:bg-dark-700 text-slate-300 rounded-xl text-xs cursor-pointer"
+                    className="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-dark-800 dark:hover:bg-dark-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs cursor-pointer"
                   >
-                    Cancel
+                    {t('cancelBtn')}
                   </button>
                   <button
                     type="submit"
                     className="flex items-center gap-1.5 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl text-xs cursor-pointer"
                   >
-                    <Save size={14} /> Add Package Tier
+                    <Save size={14} /> {t('addPackageTier')}
                   </button>
                 </div>
               </form>
@@ -690,10 +725,10 @@ export const AdminDashboard: React.FC = () => {
           )}
 
           {/* Info Card */}
-          <div className="glass-card rounded-2xl border border-dark-800 p-5 flex items-center gap-3 text-xs text-slate-400">
-            <AlertCircle className="text-accent-400 shrink-0" size={16} />
+          <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 p-5 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 bg-white/40 dark:bg-transparent animate-pulse">
+            <AlertCircle className="text-accent-500 dark:text-accent-400 shrink-0" size={16} />
             <span>
-              To edit or remove existing package tiers, select a game from the <strong>Manage Games</strong> tab to perform modular adjustments.
+              {t('packageNote')}
             </span>
           </div>
         </div>
