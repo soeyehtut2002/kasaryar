@@ -19,7 +19,15 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-6 text-sm">
             <a href="#" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Support</a>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new Event('open-support-chat'));
+              }}
+              className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors cursor-pointer bg-transparent border-0 font-medium"
+            >
+              Support
+            </button>
           </div>
         </div>
       </div>

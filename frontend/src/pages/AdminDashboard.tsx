@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,9 @@ import {
   Layers,
   ShoppingBag,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  MessageSquare,
+  Send
 } from 'lucide-react';
 
 interface Order {
@@ -59,11 +61,104 @@ export const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'packages'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'packages' | 'chat'>('overview');
   const [data, setData] = useState<DashboardData | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Support Chat States
+  const [chatRooms, setChatRooms] = useState<any[]>([]);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [adminChatInput, setAdminChatInput] = useState('');
+  const [sendingAdminMsg, setSendingAdminMsg] = useState(false);
+
+  const adminMessagesEndRef = useRef<HTMLDivElement>(null);
+
+  const fetchChatRooms = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/chat/rooms', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const resData = await res.json();
+      if (res.ok && resData.status === 'success') {
+        setChatRooms(resData.data.rooms);
+      }
+    } catch (err) {
+      console.error('Error fetching admin chat rooms:', err);
+    }
+  };
+
+  const fetchChatMessages = async (roomId: string) => {
+    try {
+      const res = await fetch(`/api/chat/messages/${roomId}`);
+      const resData = await res.json();
+      if (res.ok && resData.status === 'success') {
+        setChatMessages(resData.data.messages);
+      }
+    } catch (err) {
+      console.error('Error fetching admin room messages:', err);
+    }
+  };
+
+  const handleAdminSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminChatInput.trim() || !selectedRoomId || !token || sendingAdminMsg) return;
+
+    const textToSend = adminChatInput.trim();
+    setAdminChatInput('');
+    setSendingAdminMsg(true);
+
+    try {
+      const res = await fetch('/api/chat/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          roomId: selectedRoomId,
+          message: textToSend
+        })
+      });
+
+      const resData = await res.json();
+      if (res.ok && resData.status === 'success') {
+        setChatMessages(prev => [...prev, resData.data.message]);
+        fetchChatRooms();
+      }
+    } catch (err) {
+      console.error('Error admin sending chat message:', err);
+    } finally {
+      setSendingAdminMsg(false);
+    }
+  };
+
+  // Chat Polling
+  useEffect(() => {
+    if (activeTab !== 'chat' || !token) return;
+    fetchChatRooms();
+    const roomsInterval = setInterval(fetchChatRooms, 6000);
+    return () => clearInterval(roomsInterval);
+  }, [activeTab, token]);
+
+  useEffect(() => {
+    if (activeTab !== 'chat' || !selectedRoomId) return;
+    fetchChatMessages(selectedRoomId);
+    const messagesInterval = setInterval(() => {
+      fetchChatMessages(selectedRoomId);
+    }, 3000);
+    return () => clearInterval(messagesInterval);
+  }, [activeTab, selectedRoomId]);
+
+  // Scroll Chat to Bottom
+  useEffect(() => {
+    if (activeTab === 'chat') {
+      adminMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, activeTab]);
 
   // Forms states
   const [gameForm, setGameForm] = useState({
@@ -314,7 +409,8 @@ export const AdminDashboard: React.FC = () => {
         {[
           { id: 'overview', name: t('overviewStats'), icon: TrendingUp },
           { id: 'games', name: t('manageGames'), icon: Gamepad2 },
-          { id: 'packages', name: t('managePackages'), icon: Layers }
+          { id: 'packages', name: t('managePackages'), icon: Layers },
+          { id: 'chat', name: 'Live Support Chat', icon: MessageSquare }
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -730,6 +826,118 @@ export const AdminDashboard: React.FC = () => {
             <span>
               {t('packageNote')}
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* Live Support Chat Tab */}
+      {activeTab === 'chat' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px] border border-slate-200 dark:border-dark-800 rounded-2xl overflow-hidden glass-card bg-white/40 dark:bg-transparent">
+          {/* Rooms Sidebar */}
+          <div className="md:col-span-1 border-r border-slate-200 dark:border-dark-800 flex flex-col h-full bg-slate-50/50 dark:bg-dark-900/30">
+            <div className="p-4 border-b border-slate-200 dark:border-dark-800 font-extrabold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+              <MessageSquare size={16} /> Active Conversations
+            </div>
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-dark-800 custom-scrollbar">
+              {chatRooms.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                  No active customer sessions.
+                </div>
+              ) : (
+                chatRooms.map((room) => {
+                  const latestMsg = room.messages?.[0]?.message || 'No messages yet';
+                  const isSelected = selectedRoomId === room.id;
+                  return (
+                    <button
+                      key={room.id}
+                      onClick={() => setSelectedRoomId(room.id)}
+                      className={`w-full text-left p-3.5 flex flex-col gap-1 transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-primary-500/10 dark:bg-primary-500/5 border-l-4 border-primary-500'
+                          : 'hover:bg-slate-100/50 dark:hover:bg-dark-900/10'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center w-full">
+                        <span className="font-bold text-xs text-slate-850 dark:text-slate-200 line-clamp-1">{room.clientName}</span>
+                        <span className="text-[9px] text-slate-400 dark:text-slate-500">
+                          {new Date(room.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-550 dark:text-slate-450 line-clamp-1 italic">
+                        {latestMsg}
+                      </p>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Messages Pane */}
+          <div className="md:col-span-2 flex flex-col h-full bg-white dark:bg-dark-950/20">
+            {selectedRoomId ? (
+              <>
+                {/* Messages Log */}
+                <div className="flex-grow p-4 overflow-y-auto space-y-3 custom-scrollbar">
+                  {chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2 max-w-[85%] items-start ${
+                        msg.isAdmin ? 'ml-auto flex-row-reverse' : 'mr-auto'
+                      }`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border ${
+                          msg.isAdmin
+                            ? 'bg-primary-500/10 text-primary-500 border-primary-500/20'
+                            : 'bg-slate-200 dark:bg-dark-800 text-slate-550 dark:text-slate-400 border-slate-350 dark:border-dark-700'
+                        }`}
+                      >
+                        {msg.isAdmin ? 'A' : 'U'}
+                      </div>
+                      <div
+                        className={`p-2.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
+                          msg.isAdmin
+                            ? 'bg-primary-500 text-white rounded-tr-none'
+                            : 'bg-slate-100 dark:bg-dark-900 border border-slate-200/60 dark:border-dark-800/80 rounded-tl-none text-slate-800 dark:text-slate-200'
+                        }`}
+                      >
+                        {msg.message}
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={adminMessagesEndRef} />
+                </div>
+
+                {/* Input form */}
+                <form
+                  onSubmit={handleAdminSendMessage}
+                  className="p-3 border-t border-slate-200 dark:border-dark-800 bg-slate-50 dark:bg-dark-900 flex gap-2 items-center"
+                >
+                  <input
+                    type="text"
+                    required
+                    value={adminChatInput}
+                    onChange={(e) => setAdminChatInput(e.target.value)}
+                    placeholder="Type your response..."
+                    disabled={sendingAdminMsg}
+                    className="flex-1 px-3 py-1.5 bg-white dark:bg-dark-950 border border-slate-250 dark:border-dark-800 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary-500"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!adminChatInput.trim() || sendingAdminMsg}
+                    className="p-1.5 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:bg-slate-200 dark:disabled:bg-dark-850 text-white disabled:text-slate-400 dark:disabled:text-slate-600 shadow-md cursor-pointer flex items-center justify-center shrink-0"
+                  >
+                    {sendingAdminMsg ? <Loader2 className="animate-spin" size={14} /> : <Send size={14} />}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 gap-2 p-8">
+                <MessageSquare size={36} className="text-slate-300 dark:text-slate-700 animate-pulse" />
+                <span className="text-xs font-semibold">Select a customer conversation to start live assistance</span>
+              </div>
+            )}
           </div>
         </div>
       )}

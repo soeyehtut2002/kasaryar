@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 import shopRoutes from './routes/shopRoutes';
 import adminRoutes from './routes/adminRoutes';
+import chatRoutes from './routes/chatRoutes';
 import { errorHandler } from './middleware/error';
 import { AppError } from './utils/appError';
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api', shopRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Unhandled routes
 app.all('*', (req, res, next) => {

@@ -11,6 +11,7 @@ import { GameDetail } from './pages/GameDetail';
 
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { FloatingChat } from './components/chat/FloatingChat';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
                 </Routes>
               </main>
               <Footer />
+              <FloatingChat />
             </div>
           </Router>
         </AuthProvider>
