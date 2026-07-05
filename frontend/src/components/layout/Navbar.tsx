@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import {
-  Shield, LogOut, LayoutDashboard, Sun, Moon,
+  Shield, LogOut, LayoutDashboard, Sun, Moon, Globe,
   Gamepad2, Newspaper, Users, Menu, X
 } from 'lucide-react';
 
@@ -100,10 +100,10 @@ export const Navbar: React.FC = () => {
             {/* Language */}
             <button
               onClick={() => setLanguage(language === 'en' ? 'mm' : 'en')}
-              className="px-1.5 py-1 text-xs font-extrabold rounded-lg border border-slate-200 dark:border-dark-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-800/50 transition-all flex items-center gap-0.5 cursor-pointer"
+              className="px-2 py-1 text-xs font-bold rounded-lg border border-slate-200 dark:border-dark-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-800/50 transition-all flex items-center gap-1 cursor-pointer"
             >
-              <span className="text-sm">{language === 'en' ? '🇲🇲' : '🇺🇸'}</span>
-              <span className="text-[9px] tracking-wider uppercase font-mono">{language === 'en' ? 'MM' : 'EN'}</span>
+              <Globe size={14} className="text-slate-400" />
+              <span className="text-[10px] tracking-wider uppercase">{language === 'en' ? 'MM' : 'EN'}</span>
             </button>
 
             {/* Auth */}

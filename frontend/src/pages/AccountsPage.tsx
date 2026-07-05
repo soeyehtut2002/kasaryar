@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import {
-  Star, CheckCircle, AlertTriangle,
+  Star, CheckCircle, AlertTriangle, Award, Medal, Hexagon,
   MessageCircle, Search, Crown, Swords, Zap, Users
 } from 'lucide-react';
 
@@ -14,7 +14,7 @@ interface AccountListing {
   rating: number;
   reviewCount: number;
   rank: string;
-  rankIcon: string;
+  rankIcon: React.ReactNode;
   level: number;
   heroes?: number;
   skins?: number;
@@ -34,7 +34,7 @@ interface AccountListing {
 const LISTINGS: AccountListing[] = [
   {
     id: 1, game: 'MLBB', seller: 'ProSeller_99', rating: 4.9, reviewCount: 128,
-    rank: 'Mythical Glory', rankIcon: '👑', level: 305,
+    rank: 'Mythical Glory', rankIcon: <Crown size={18} className="text-amber-400" />, level: 305,
     heroes: 120, skins: 85,
     price: 65000, verified: true, hot: true,
     badge: 'TOP SELLER', badgeColor: 'bg-amber-500',
@@ -45,7 +45,7 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 2, game: 'MLBB', seller: 'MLBBStore_MM', rating: 4.7, reviewCount: 64,
-    rank: 'Mythic', rankIcon: '⚡', level: 222,
+    rank: 'Mythic', rankIcon: <Hexagon size={18} className="text-purple-400" />, level: 222,
     heroes: 80, skins: 45,
     price: 35000, verified: true, hot: false,
     badge: 'VERIFIED', badgeColor: 'bg-emerald-500',
@@ -56,7 +56,7 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 3, game: 'MLBB', seller: 'GalaxyAcc', rating: 4.5, reviewCount: 41,
-    rank: 'Legend', rankIcon: '🌟', level: 155,
+    rank: 'Legend', rankIcon: <Star size={18} className="text-emerald-400" />, level: 155,
     heroes: 55, skins: 22,
     price: 18000, verified: false, hot: false,
     badge: 'BUDGET', badgeColor: 'bg-sky-500',
@@ -67,7 +67,7 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 4, game: 'PUBGM', seller: 'PUBGKing_01', rating: 4.8, reviewCount: 97,
-    rank: 'Conqueror', rankIcon: '💎', level: 80,
+    rank: 'Conqueror', rankIcon: <Crown size={18} className="text-red-400" />, level: 80,
     characters: 5, outfits: 60,
     price: 75000, verified: true, hot: true,
     badge: 'TOP SELLER', badgeColor: 'bg-amber-500',
@@ -78,7 +78,7 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 5, game: 'PUBGM', seller: 'TopUp_Center', rating: 4.6, reviewCount: 53,
-    rank: 'Ace', rankIcon: '🏆', level: 65,
+    rank: 'Ace', rankIcon: <Award size={18} className="text-amber-300" />, level: 65,
     characters: 3, outfits: 30,
     price: 40000, verified: true, hot: false,
     badge: 'VERIFIED', badgeColor: 'bg-emerald-500',
@@ -89,7 +89,7 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 6, game: 'PUBGM', seller: 'BudgetAcc_MM', rating: 4.2, reviewCount: 28,
-    rank: 'Platinum', rankIcon: '🥈', level: 45,
+    rank: 'Platinum', rankIcon: <Medal size={18} className="text-slate-300" />, level: 45,
     characters: 2, outfits: 12,
     price: 15000, verified: false, hot: false,
     badge: 'BUDGET', badgeColor: 'bg-sky-500',
@@ -194,8 +194,8 @@ export const AccountsPage: React.FC = () => {
             }`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-2xl">{item.rankIcon}</span>
+                  <div className="flex items-center gap-1.5 mb-1 bg-white/10 w-fit px-2 py-1 rounded-lg backdrop-blur-sm">
+                    {item.rankIcon}
                     <div>
                       <p className="text-white font-black text-sm leading-tight">{item.rank}</p>
                       <p className="text-white/70 text-[10px]">Lv. {item.level}</p>
@@ -207,8 +207,8 @@ export const AccountsPage: React.FC = () => {
                     {item.badge}
                   </span>
                   {item.hot && (
-                    <span className="bg-red-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                      🔥 HOT
+                    <span className="bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full tracking-wider">
+                      HOT
                     </span>
                   )}
                 </div>

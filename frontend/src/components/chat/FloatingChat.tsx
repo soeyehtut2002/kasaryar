@@ -51,7 +51,7 @@ export const FloatingChat: React.FC = () => {
   const t = {
     en: {
       tagline: 'We typically reply in minutes',
-      welcomeTitle: 'Hi there 👋',
+      welcomeTitle: 'Hi there',
       welcomeBody: 'Ask us anything, or share your feedback.',
       startChat: 'Start a conversation',
       viewAll: 'View all conversations',
@@ -69,7 +69,7 @@ export const FloatingChat: React.FC = () => {
     },
     mm: {
       tagline: 'ကျွန်ုပ်တို့ မိနစ်အနည်းငယ်အတွင်း ဖြေကြားပါမည်',
-      welcomeTitle: 'မင်္ဂလာပါ 👋',
+      welcomeTitle: 'မင်္ဂလာပါ',
       welcomeBody: 'ဘာမဆို မေးမြန်းနိုင်ပါသည်။',
       startChat: 'စကားစတင်ပြောဆိုပါ',
       viewAll: 'စကားပြောမှတ်တမ်းများ',
@@ -438,7 +438,7 @@ export const FloatingChat: React.FC = () => {
                             <span className="text-[9px] text-slate-400 shrink-0">{formatDate(room.updatedAt)}</span>
                           </div>
                           <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                            {lastMsg ? (lastMsg.isAdmin ? '🟢 ' : '👤 ') + lastMsg.message : 'No messages yet'}
+                            {lastMsg ? (lastMsg.isAdmin ? 'Support: ' : 'You: ') + lastMsg.message : 'No messages yet'}
                           </p>
                         </div>
                       </button>
@@ -508,7 +508,7 @@ export const FloatingChat: React.FC = () => {
                     K
                   </div>
                   <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed shadow-sm">
-                    Hi there! How can we help you today? 👋
+                    Hi there! How can we help you today?
                   </div>
                 </div>
 
