@@ -3,7 +3,8 @@ import {
   initiateRoom,
   sendMessage,
   getRoomMessages,
-  adminGetRooms
+  adminGetRooms,
+  getClientRooms
 } from '../controllers/chatController';
 import { protect, optionalProtect, restrictTo } from '../middleware/auth';
 import { Role } from '@prisma/client';
@@ -14,6 +15,7 @@ const router = Router();
 router.post('/initiate', optionalProtect, initiateRoom);
 router.post('/messages', optionalProtect, sendMessage);
 router.get('/messages/:roomId', getRoomMessages);
+router.post('/my-rooms', optionalProtect, getClientRooms);
 
 // Admin-only endpoints
 router.get('/rooms', protect, restrictTo(Role.ADMIN), adminGetRooms);

@@ -10,6 +10,25 @@ export const initiateRoom = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id; // Optional user ID if authenticated
     const username = (req as any).user?.username || clientName || 'Guest Support';
 
+    // If user is authenticated, check if they already have an active chat room
+    if (userId) {
+      const existingUserRoom = await prisma.chatRoom.findFirst({
+        where: { userId },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' }
+          }
+        }
+      });
+
+      if (existingUserRoom) {
+        return res.status(200).json({
+          status: 'success',
+          data: { room: existingUserRoom }
+        });
+      }
+    }
+
     // If a roomId is provided, check if it exists
     if (roomId) {
       const existingRoom = await prisma.chatRoom.findUnique({
@@ -172,6 +191,43 @@ export const adminGetRooms = async (req: Request, res: Response) => {
     return res.status(500).json({
       status: 'error',
       message: error.message || 'Failed to load support chat list'
+    });
+  }
+};
+
+// Client route to list rooms associated with user (by userId or list of IDs)
+export const getClientRooms = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { roomIds } = req.body; // Array of guest room UUIDs from client localStorage
+    
+    const parsedRoomIds = Array.isArray(roomIds) ? roomIds : [];
+
+    const rooms = await prisma.chatRoom.findMany({
+      where: {
+        OR: [
+          ...(userId ? [{ userId }] : []),
+          ...(parsedRoomIds.length > 0 ? [{ id: { in: parsedRoomIds } }] : [])
+        ]
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        }
+      }
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      data: { rooms }
+    });
+  } catch (error: any) {
+    console.error('Error fetching client rooms:', error);
+    return res.status(500).json({
+      status: 'error',
+      message: error.message || 'Failed to load conversation history'
     });
   }
 };
