@@ -55,6 +55,7 @@ model ItemPackage {
   diamonds      Int      
   isAvailable   Boolean  @default(true)
   orders        Order[]
+  flashSales    FlashSale[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -98,4 +99,39 @@ model ChatMessage {
   createdAt DateTime @default(now())
 
   @@map("chat_messages")
+}
+
+model PromoBanner {
+  id         String   @id @default(uuid())
+  title      String
+  subtitle   String
+  imageUrl   String
+  colorTheme String   @default("from-blue-600/90 to-indigo-900/90")
+  isActive   Boolean  @default(true)
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FlashSale {
+  id                 String      @id @default(uuid())
+  packageId          String
+  itemPackage        ItemPackage @relation(fields: [packageId], references: [id])
+  discountPercentage Int         @default(0)
+  endTime            DateTime
+  customIconUrl      String?
+  isActive           Boolean     @default(true)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+}
+
+model SpecialPromo {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  buttonText  String
+  buttonLink  String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

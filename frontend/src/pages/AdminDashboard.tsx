@@ -17,8 +17,10 @@ import {
   Loader2,
   AlertCircle,
   MessageSquare,
-  Send
+  Send,
+  LayoutTemplate
 } from 'lucide-react';
+import { AdminCMS } from '../components/admin/AdminCMS';
 
 interface Order {
   id: string;
@@ -61,7 +63,7 @@ export const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'packages' | 'chat'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'packages' | 'chat' | 'cms'>('overview');
   const [data, setData] = useState<DashboardData | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -410,7 +412,8 @@ export const AdminDashboard: React.FC = () => {
           { id: 'overview', name: t('overviewStats'), icon: TrendingUp },
           { id: 'games', name: t('manageGames'), icon: Gamepad2 },
           { id: 'packages', name: t('managePackages'), icon: Layers },
-          { id: 'chat', name: 'Live Support Chat', icon: MessageSquare }
+          { id: 'chat', name: 'Live Support Chat', icon: MessageSquare },
+          { id: 'cms', name: 'Landing Page CMS', icon: LayoutTemplate }
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -706,6 +709,11 @@ export const AdminDashboard: React.FC = () => {
             ))}
           </div>
         </div>
+      )}
+
+      {/* CMS Tab */}
+      {activeTab === 'cms' && (
+        <AdminCMS />
       )}
 
       {/* Packages Manager Tab */}

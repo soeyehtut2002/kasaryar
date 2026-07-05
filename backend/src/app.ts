@@ -4,6 +4,7 @@ import authRoutes from './routes/authRoutes';
 import shopRoutes from './routes/shopRoutes';
 import adminRoutes from './routes/adminRoutes';
 import chatRoutes from './routes/chatRoutes';
+import cmsRoutes from './routes/cmsRoutes';
 import { errorHandler } from './middleware/error';
 import { AppError } from './utils/appError';
 
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', shopRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/cms', cmsRoutes);
 
 // Unhandled routes
 app.all('*', (req, res, next) => {
