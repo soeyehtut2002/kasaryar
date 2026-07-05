@@ -256,27 +256,36 @@ export const FloatingChat: React.FC = () => {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex gap-2 max-w-[85%] items-start ${
-                      msg.isAdmin ? 'mr-auto' : 'ml-auto flex-row-reverse'
+                    className={`flex flex-col max-w-[85%] ${
+                      msg.isAdmin ? 'mr-auto items-start' : 'ml-auto items-end'
                     }`}
                   >
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 mb-0.5 px-1 font-semibold">
+                      {msg.isAdmin ? 'KasarYar Support' : 'You'}
+                    </span>
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border ${
-                        msg.isAdmin
-                          ? 'bg-slate-200 dark:bg-dark-800 text-slate-550 dark:text-slate-400 border-slate-350 dark:border-dark-700'
-                          : 'bg-primary-500/10 text-primary-500 border-primary-500/20'
+                      className={`flex gap-1.5 items-start ${
+                        msg.isAdmin ? '' : 'flex-row-reverse'
                       }`}
                     >
-                      {msg.isAdmin ? 'A' : 'U'}
-                    </div>
-                    <div
-                      className={`p-2.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
-                        msg.isAdmin
-                          ? 'bg-slate-100 dark:bg-dark-900 border border-slate-200/60 dark:border-dark-800/80 rounded-tl-none text-slate-800 dark:text-slate-200'
-                          : 'bg-primary-500 text-white rounded-tr-none'
-                      }`}
-                    >
-                      {msg.message}
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border ${
+                          msg.isAdmin
+                            ? 'bg-slate-200 dark:bg-dark-800 text-slate-550 dark:text-slate-400 border-slate-350 dark:border-dark-700'
+                            : 'bg-primary-500/10 text-primary-500 border-primary-500/20'
+                        }`}
+                      >
+                        {msg.isAdmin ? 'A' : 'U'}
+                      </div>
+                      <div
+                        className={`p-2.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
+                          msg.isAdmin
+                            ? 'bg-slate-100 dark:bg-dark-900 border border-slate-200/60 dark:border-dark-800/80 rounded-tl-none text-slate-800 dark:text-slate-200'
+                            : 'bg-primary-500 text-white rounded-tr-none'
+                        }`}
+                      >
+                        {msg.message}
+                      </div>
                     </div>
                   </div>
                 ))}
