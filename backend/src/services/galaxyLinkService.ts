@@ -1,131 +1,122 @@
 import crypto from 'crypto';
 
-const GALAXYLINK_API_URL = process.env.GALAXYLINK_API_URL || 'https://api.galaxylink.com.mm/v1';
-const GALAXYLINK_PARTNER_ID = process.env.GALAXYLINK_PARTNER_ID || '';
-const GALAXYLINK_SECRET_KEY = process.env.GALAXYLINK_SECRET_KEY || '';
+const GALAXYLINK_API_URL = process.env.GALAXYLINK_API_URL || 'https://api.galaxylink.gg';
+const GALAXYLINK_CLIENT_ID = process.env.GALAXYLINK_CLIENT_ID || '1'; // Default placeholder client id
+const GALAXYLINK_API_KEY = process.env.GALAXYLINK_API_KEY || 'your_secret_api_key';
+
+// Token caching variables (ဆာဗာသက်တမ်း ၂ နာရီဖြစ်လို့ memory ထဲမှာ cache လုပ်ပြီး ယူသုံးပါမည်)
+let cachedToken: string | null = null;
+let tokenExpiryTime: number = 0; // Epoch timestamp in milliseconds
 
 /**
- * MD5 သို့မဟုတ် SHA256 Signature ထုတ်လုပ်ပေးသော helper
- * GalaxyLink documentation ညွှန်ကြားချက်အတိုင်း parameters များကို sorting/hashing လုပ်ရန် သုံးသည်
+ * ၁။ GalaxyLink B2B Token တောင်းယူခြင်း (POST /auth/token)
+ * Screenshot ရှိ PHP implementation အတိုင်း တိကျစွာ ရေးသားထားပါသည်
  */
-const generateSignature = (params: Record<string, any>): string => {
-  // 1. Keys များကို Alphabetical order (a-z) အလိုက် စီသည်
-  const sortedKeys = Object.keys(params).sort();
-  
-  // 2. key=value String တွဲများ ပြုလုပ်သည်
-  const queryString = sortedKeys
-    .map(key => `${key}=${params[key]}`)
-    .join('&');
-    
-  // 3. String အနောက်တွင် Secret Key ပေါင်းထည့်သည်
-  const signString = `${queryString}&secret_key=${GALAXYLINK_SECRET_KEY}`;
-  
-  // 4. SHA256 hash ထုတ်ယူသည် (GalaxyLink API စံနှုန်းအတိုင်း MD5 သို့မဟုတ် SHA256 သုံးနိုင်သည်)
-  return crypto.createHash('sha256').update(signString).digest('hex');
-};
+export const getAuthToken = async (): Promise<string> => {
+  // Token သက်တမ်း ၅ မိနစ်ထက်ပိုကျန်သေးရင် Cache ထဲကပဲ ပြန်သုံးမည်
+  if (cachedToken && Date.now() < tokenExpiryTime - 5 * 60 * 1000) {
+    return cachedToken;
+  }
 
-/**
- * ၁။ GalaxyLink B2B Merchant Balance စစ်ဆေးခြင်း
- */
-export const checkBalance = async () => {
   try {
     const timestamp = Math.floor(Date.now() / 1000);
-    const params = {
-      partner_id: GALAXYLINK_PARTNER_ID,
-      timestamp
-    };
-    
-    const signature = generateSignature(params);
-    
-    const response = await fetch(`${GALAXYLINK_API_URL}/balance`, {
+    // Signature Formula: sha256(apiKey + timestamp)
+    const signSource = `${GALAXYLINK_API_KEY}${timestamp}`;
+    const sign = crypto.createHash('sha256').update(signSource).digest('hex');
+
+    const response = await fetch(`${GALAXYLINK_API_URL}/auth/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-Signature': signature
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(params)
+      body: JSON.stringify({
+        client_id: GALAXYLINK_CLIENT_ID,
+        timestamp: timestamp,
+        sign: sign
+      })
     });
-    
+
     const data = await response.json();
-    return data; // returns: { balance: number, currency: string, ... }
+    
+    // API Response မှ token ရယူခြင်း
+    if (!response.ok || !data.token) {
+      throw new Error(data.message || 'Token generation failed');
+    }
+
+    cachedToken = data.token;
+    // သက်တမ်း ၂ နာရီဖြစ်သော်လည်း ဆာဗာလုံခြုံရေးအတွက် ၁ နာရီနှင့် ၅၅ မိနစ်အထိသာ cache သက်တမ်းသတ်မှတ်သည်
+    tokenExpiryTime = Date.now() + 115 * 60 * 1000;
+
+    return cachedToken!;
   } catch (error) {
-    console.error('GalaxyLink balance fetch failed:', error);
-    throw new Error('Could not retrieve balance from provider');
+    console.error('GalaxyLink Auth Token retrieval failed:', error);
+    throw error;
   }
 };
 
 /**
- * ၂။ GalaxyLink သို့ Top-Up Order ပေးပို့ခြင်း
+ * ၂။ Game Account Validation (မလွှဲမီ User ID မှန်/မမှန် စစ်ဆေးခြင်း)
+ * GalaxyLink "Game account validation before top-up" feature အတွက်ဖြစ်သည်
  */
-export const placeOrder = async (orderData: {
+export const validateGameAccount = async (gameSlug: string, gameUserId: string, zoneId?: string) => {
+  try {
+    const token = await getAuthToken();
+    
+    const response = await fetch(`${GALAXYLINK_API_URL}/validate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        game: gameSlug,
+        game_user_id: gameUserId,
+        zone_id: zoneId || ''
+      })
+    });
+
+    const data = await response.json();
+    return data; // returns: { valid: boolean, nickname: string }
+  } catch (error) {
+    console.error('GalaxyLink validation check failed:', error);
+    return { valid: false, nickname: null, error: 'Validation check unavailable' };
+  }
+};
+
+/**
+ * ၃။ Top-Up Order ပေးပို့ခြင်း (POST /topup)
+ * Reseller order process and placement
+ */
+export const placeTopupOrder = async (orderData: {
   orderNumber: string;
   gameUserId: string;
   zoneId?: string;
   productCode: string;
 }) => {
   try {
-    const timestamp = Math.floor(Date.now() / 1000);
+    const token = await getAuthToken();
     
-    const params: Record<string, any> = {
-      partner_id: GALAXYLINK_PARTNER_ID,
+    const body = {
       partner_order_id: orderData.orderNumber,
       game_user_id: orderData.gameUserId,
-      product_code: orderData.productCode,
-      timestamp
+      zone_id: orderData.zoneId || '',
+      product_code: orderData.productCode
     };
-    
-    if (orderData.zoneId) {
-      params.zone_id = orderData.zoneId;
-    }
-    
-    const signature = generateSignature(params);
-    
-    // API request details
-    const response = await fetch(`${GALAXYLINK_API_URL}/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Signature': signature
-      },
-      body: JSON.stringify(params)
-    });
-    
-    const data = await response.json();
-    return data; 
-    // Response standard: { status: 'SUCCESS' | 'PENDING' | 'FAILED', provider_order_id: string }
-  } catch (error) {
-    console.error('GalaxyLink place order failed:', error);
-    throw new Error('Failed to submit top-up request to GalaxyLink');
-  }
-};
 
-/**
- * ၃။ GalaxyLink Order Status အား (Webhook မရပါက) Polling ဖြင့် လှမ်းစစ်ခြင်း
- */
-export const queryOrderStatus = async (orderNumber: string) => {
-  try {
-    const timestamp = Math.floor(Date.now() / 1000);
-    const params = {
-      partner_id: GALAXYLINK_PARTNER_ID,
-      partner_order_id: orderNumber,
-      timestamp
-    };
-    
-    const signature = generateSignature(params);
-    
-    const response = await fetch(`${GALAXYLINK_API_URL}/orders/status`, {
+    const response = await fetch(`${GALAXYLINK_API_URL}/topup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Signature': signature
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(params)
+      body: JSON.stringify(body)
     });
-    
+
     const data = await response.json();
-    return data; // returns status: SUCCESS, FAILED, or PENDING
+    return data;
+    // Returns: { status: 'SUCCESS' | 'PENDING' | 'FAILED', transaction_id: string }
   } catch (error) {
-    console.error('GalaxyLink order status query failed:', error);
-    throw new Error('Failed to fetch transaction status from provider');
+    console.error('GalaxyLink top-up order failed:', error);
+    throw new Error('Failed to submit top-up request to GalaxyLink API');
   }
 };
