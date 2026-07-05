@@ -8,6 +8,8 @@ import { Register } from './pages/Register';
 import { UserDashboard } from './pages/UserDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { GameDetail } from './pages/GameDetail';
+import { NewsPage } from './pages/NewsPage';
+import { AccountsPage } from './pages/AccountsPage';
 
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -26,10 +28,11 @@ function App() {
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  
                   <Route path="/game/:slug" element={<GameDetail />} />
                   <Route path="/dashboard" element={<UserDashboard />} />
                   <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/accounts" element={<AccountsPage />} />
                 </Routes>
               </main>
               <Footer />
