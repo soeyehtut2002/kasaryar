@@ -12,15 +12,59 @@ interface Game {
   description?: string;
 }
 
+// Default fallback data — shown immediately, then replaced by CMS API data
+const DEFAULT_BANNERS = [
+  {
+    id: 'default-1',
+    title: 'Mobile Legends Starlight',
+    subtitle: 'Get 30% bonus diamonds on first recharge this month.',
+    imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80',
+    colorTheme: 'from-blue-600/90 to-indigo-900/90',
+    isActive: true,
+  },
+  {
+    id: 'default-2',
+    title: 'PUBG Mobile UC Sale',
+    subtitle: 'Exclusive outfits and weapon skins available now.',
+    imageUrl: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=1200&q=80',
+    colorTheme: 'from-amber-600/90 to-orange-900/90',
+    isActive: true,
+  },
+  {
+    id: 'default-3',
+    title: 'Valorant Points Drop',
+    subtitle: 'New Night Market is here. Top up now!',
+    imageUrl: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=1200&q=80',
+    colorTheme: 'from-red-600/90 to-rose-900/90',
+    isActive: true,
+  },
+];
+
+const DEFAULT_FLASH_SALES = [
+  { id: 'fs-1', name: 'PUBGM 660 UC', discount: 20, price: 9.99, originalPrice: 11.99 },
+  { id: 'fs-2', name: 'MLBB 275 Diamonds', discount: 15, price: 4.99, originalPrice: 5.49 },
+  { id: 'fs-3', name: 'Free Fire 520 Diamonds', discount: 25, price: 4.99, originalPrice: 6.49 },
+  { id: 'fs-4', name: 'PUBGM 325 UC', discount: 10, price: 4.99, originalPrice: 5.99 },
+];
+
+const DEFAULT_SPECIAL_PROMO = {
+  title: 'Get 5% Cashback with KBZPay',
+  description: 'Enjoy 5% cashback on all top-ups every Friday when you pay using KBZPay.',
+  buttonText: 'Learn More',
+  buttonLink: '#',
+  isActive: true,
+};
+
 export const Landing: React.FC = () => {
   const { t, language } = useLanguage();
   const mm = language === 'mm';
-  
+
   const [games, setGames] = useState<Game[]>([]);
-  const [banners, setBanners] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>(DEFAULT_BANNERS);
   const [flashSales, setFlashSales] = useState<any[]>([]);
-  const [specialPromo, setSpecialPromo] = useState<any>(null);
-  
+  const [flashSalesRaw, setFlashSalesRaw] = useState<any[]>([]);
+  const [specialPromo, setSpecialPromo] = useState<any>(DEFAULT_SPECIAL_PROMO);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -32,19 +76,29 @@ export const Landing: React.FC = () => {
           fetch('/api/games'),
           fetch('/api/cms/banners'),
           fetch('/api/cms/flash-sales'),
-          fetch('/api/cms/special-promo')
+          fetch('/api/cms/special-promo'),
         ]);
-        
+
         const gData = await gRes.json();
         const bData = await bRes.json();
         const fData = await fRes.json();
         const sData = await sRes.json();
-        
+
         if (gData.status === 'success') setGames(gData.data.games);
-        if (bData.status === 'success') setBanners(bData.data.banners.filter((b: any) => b.isActive));
-        if (fData.status === 'success') setFlashSales(fData.data.flashSales.filter((f: any) => f.isActive));
-        if (sData.status === 'success') setSpecialPromo(sData.data.promo);
-        
+
+        if (bData.status === 'success') {
+          const active = bData.data.banners.filter((b: any) => b.isActive);
+          if (active.length > 0) setBanners(active);
+        }
+
+        if (fData.status === 'success') {
+          const active = fData.data.flashSales.filter((f: any) => f.isActive);
+          setFlashSalesRaw(active);
+        }
+
+        if (sData.status === 'success' && sData.data.promo) {
+          setSpecialPromo(sData.data.promo);
+        }
       } catch (err) {
         console.error(err);
         setError('Network error. Please try again later.');
@@ -71,10 +125,14 @@ export const Landing: React.FC = () => {
     if (banners.length > 0) setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
+  // Determine which flash sale items to show
+  const displayFlashSales = flashSalesRaw.length > 0 ? flashSalesRaw : null;
+  const showDefaultFlash = !loading && flashSalesRaw.length === 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 transition-colors duration-300">
-      
-      {/* ── 1. Hero Carousel Banner (Midasbuy style) ── */}
+
+      {/* ── 1. Hero Carousel Banner ── */}
       {banners.length > 0 && (
         <div className="relative w-full h-[200px] sm:h-[320px] md:h-[400px] rounded-2xl overflow-hidden mb-10 group shadow-lg bg-slate-900">
           {banners.map((banner, idx) => (
@@ -86,7 +144,7 @@ export const Landing: React.FC = () => {
             >
               <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
               <div className={`absolute inset-0 bg-gradient-to-r ${banner.colorTheme} via-black/50 to-transparent`} />
-              
+
               <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-16 md:px-24">
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-2 max-w-lg drop-shadow-md leading-tight">
                   {banner.title}
@@ -110,7 +168,7 @@ export const Landing: React.FC = () => {
               <button onClick={nextBanner} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
                 <ChevronRight size={20} />
               </button>
-              
+
               {/* Indicators */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                 {banners.map((_, idx) => (
@@ -129,7 +187,7 @@ export const Landing: React.FC = () => {
       )}
 
       {/* ── 2. Flash Sale Section ── */}
-      {flashSales.length > 0 && (
+      {(displayFlashSales || showDefaultFlash) && (
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -144,32 +202,53 @@ export const Landing: React.FC = () => {
               LIVE NOW
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {flashSales.map((fs) => (
-              <Link to={`/game/${fs.itemPackage?.game?.slug}`} key={fs.id} className="bg-white dark:bg-dark-900 rounded-xl border border-red-100 dark:border-red-900/30 overflow-hidden group cursor-pointer hover:shadow-lg transition-all">
-                <div className="relative h-28 bg-gradient-to-br from-red-50 to-orange-50 dark:from-dark-800 dark:to-dark-800 flex items-center justify-center overflow-hidden">
-                  {fs.customIconUrl ? (
-                    <img src={fs.customIconUrl} alt="Flash Sale Item" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" />
-                  ) : (
+            {displayFlashSales ? (
+              /* Dynamic flash sales from API */
+              displayFlashSales.map((fs) => (
+                <Link to={fs.itemPackage?.game?.slug ? `/game/${fs.itemPackage.game.slug}` : '#'} key={fs.id} className="bg-white dark:bg-dark-900 rounded-xl border border-red-100 dark:border-red-900/30 overflow-hidden group cursor-pointer hover:shadow-lg transition-all">
+                  <div className="relative h-28 bg-gradient-to-br from-red-50 to-orange-50 dark:from-dark-800 dark:to-dark-800 flex items-center justify-center overflow-hidden">
+                    {fs.customIconUrl ? (
+                      <img src={fs.customIconUrl} alt="Flash Sale Item" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" />
+                    ) : (
+                      <Gift size={40} className="text-red-400 group-hover:scale-110 transition-transform duration-300" />
+                    )}
+                    <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md">
+                      -{fs.discountPercentage}%
+                    </div>
+                  </div>
+                  <div className="p-3 text-center">
+                    <p className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1 line-clamp-1">{fs.itemPackage?.name}</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <p className="text-red-500 font-black text-sm">
+                        ${((fs.itemPackage?.price || 0) * (1 - fs.discountPercentage / 100)).toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-slate-400 line-through">${fs.itemPackage?.price}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              /* Default fallback flash sales */
+              DEFAULT_FLASH_SALES.map((fs) => (
+                <div key={fs.id} className="bg-white dark:bg-dark-900 rounded-xl border border-red-100 dark:border-red-900/30 overflow-hidden group cursor-pointer hover:shadow-lg transition-all">
+                  <div className="relative h-28 bg-gradient-to-br from-red-50 to-orange-50 dark:from-dark-800 dark:to-dark-800 flex items-center justify-center overflow-hidden">
                     <Gift size={40} className="text-red-400 group-hover:scale-110 transition-transform duration-300" />
-                  )}
-                  
-                  <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md">
-                    -{fs.discountPercentage}%
+                    <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md">
+                      -{fs.discount}%
+                    </div>
+                  </div>
+                  <div className="p-3 text-center">
+                    <p className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1">{fs.name}</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <p className="text-red-500 font-black text-sm">${fs.price.toFixed(2)}</p>
+                      <p className="text-[10px] text-slate-400 line-through">${fs.originalPrice.toFixed(2)}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="p-3 text-center">
-                  <p className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1 line-clamp-1">{fs.itemPackage?.name}</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <p className="text-red-500 font-black text-sm">
-                       ${((fs.itemPackage?.price || 0) * (1 - fs.discountPercentage / 100)).toFixed(2)}
-                    </p>
-                    <p className="text-[10px] text-slate-400 line-through">${fs.itemPackage?.price}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}
@@ -239,7 +318,7 @@ export const Landing: React.FC = () => {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
-                
+
                 <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end">
                   <span className="text-[8px] font-extrabold text-primary-400 uppercase tracking-widest mb-0.5">
                     {game.category}

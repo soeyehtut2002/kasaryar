@@ -108,6 +108,69 @@ async function main() {
   });
   console.log(`Created game: ${freeFire.name}`);
 
+  // ── CMS: Seed Default Promo Banners ──
+  await prisma.promoBanner.deleteMany({});
+  await prisma.promoBanner.createMany({
+    data: [
+      {
+        title: 'Mobile Legends Starlight',
+        subtitle: 'Get 30% bonus diamonds on first recharge this month.',
+        imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80',
+        colorTheme: 'from-blue-600/90 to-indigo-900/90',
+        orderIndex: 0,
+        isActive: true,
+      },
+      {
+        title: 'PUBG Mobile UC Sale',
+        subtitle: 'Exclusive outfits and weapon skins available now.',
+        imageUrl: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=1200&q=80',
+        colorTheme: 'from-amber-600/90 to-orange-900/90',
+        orderIndex: 1,
+        isActive: true,
+      },
+      {
+        title: 'Valorant Points Drop',
+        subtitle: 'New Night Market is here. Top up now!',
+        imageUrl: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=1200&q=80',
+        colorTheme: 'from-red-600/90 to-rose-900/90',
+        orderIndex: 2,
+        isActive: true,
+      },
+    ],
+  });
+  console.log('Created 3 default promo banners');
+
+  // ── CMS: Seed Default Special Promo ──
+  await prisma.specialPromo.deleteMany({});
+  await prisma.specialPromo.create({
+    data: {
+      title: 'Get 5% Cashback with KBZPay',
+      description: 'Enjoy 5% cashback on all top-ups every Friday when you pay using KBZPay.',
+      buttonText: 'Learn More',
+      buttonLink: '#',
+      isActive: true,
+    },
+  });
+  console.log('Created default special promo');
+
+  // ── CMS: Seed Default Flash Sales ──
+  await prisma.flashSale.deleteMany({});
+  const allPackages = await prisma.itemPackage.findMany({ take: 4 });
+  if (allPackages.length > 0) {
+    const endTime = new Date();
+    endTime.setDate(endTime.getDate() + 30); // 30 days from now
+
+    await prisma.flashSale.createMany({
+      data: allPackages.map((pkg, idx) => ({
+        packageId: pkg.id,
+        discountPercentage: [20, 15, 25, 10][idx] || 15,
+        endTime,
+        isActive: true,
+      })),
+    });
+    console.log(`Created ${allPackages.length} default flash sales`);
+  }
+
   console.log('Seeding finished successfully!');
 }
 

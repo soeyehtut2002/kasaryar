@@ -1,4 +1,3 @@
-import { Request, Response } from 'react'; // Not using React, wait, using express
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
