@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../context/LanguageContext';
+import { useCurrency, Currency } from '../../context/CurrencyContext';
 import { useTheme } from '../../context/ThemeContext';
 import {
   Shield, LogOut, LayoutDashboard, Sun, Moon, Globe,
@@ -11,6 +12,7 @@ import {
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const { currency, setCurrency } = useCurrency();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -97,14 +99,28 @@ export const Navbar: React.FC = () => {
               {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
             </button>
 
-            {/* Language */}
-            <button
-              onClick={() => setLanguage(language === 'en' ? 'mm' : 'en')}
-              className="px-2 py-1 text-xs font-bold rounded-lg border border-slate-200 dark:border-dark-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-800/50 transition-all flex items-center gap-1 cursor-pointer"
-            >
-              <Globe size={14} className="text-slate-400" />
-              <span className="text-[10px] tracking-wider uppercase">{language === 'en' ? 'MM' : 'EN'}</span>
-            </button>
+            {/* Language & Currency */}
+            <div className="flex bg-slate-100 dark:bg-dark-800/50 rounded-lg border border-slate-200 dark:border-dark-800 p-0.5">
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'mm' : 'en')}
+                className="px-2 py-1 text-[10px] font-bold rounded-md text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-dark-700 transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <Globe size={12} className="text-slate-400" />
+                <span className="tracking-wider uppercase">{language === 'en' ? 'MM' : 'EN'}</span>
+              </button>
+              
+              <div className="w-px bg-slate-300 dark:bg-dark-600 my-1 mx-0.5"></div>
+              
+              <select 
+                value={currency} 
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                className="bg-transparent text-[10px] font-bold text-slate-700 dark:text-slate-300 cursor-pointer outline-none px-1 appearance-none"
+              >
+                <option value="USD">USD</option>
+                <option value="MMK">MMK</option>
+                <option value="THB">THB</option>
+              </select>
+            </div>
 
             {/* Auth */}
             {user ? (

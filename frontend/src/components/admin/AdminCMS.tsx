@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useCurrency } from '../../context/CurrencyContext';
 import { Plus, Trash2, Edit2, Upload } from 'lucide-react';
 import { useFileUpload } from '../../hooks/useFileUpload';
 
 export const AdminCMS: React.FC = () => {
   const { token } = useAuth();
+  const { formatPrice } = useCurrency();
   const [banners, setBanners] = useState<any[]>([]);
   const [flashSales, setFlashSales] = useState<any[]>([]);
   const [specialPromo, setSpecialPromo] = useState<any>(null);
@@ -185,7 +187,7 @@ export const AdminCMS: React.FC = () => {
               <select required value={flashForm.packageId} onChange={e => setFlashForm({...flashForm, packageId: e.target.value})} className="p-2 rounded border">
                 <option value="">Select Package</option>
                 {allPackages.map((p: any) => (
-                  <option key={p.id} value={p.id}>{p.name} (${p.price})</option>
+                  <option key={p.id} value={p.id}>{p.name} ({formatPrice(p.price)})</option>
                 ))}
               </select>
               <input required type="number" placeholder="Discount %" value={flashForm.discountPercentage} onChange={e => setFlashForm({...flashForm, discountPercentage: parseInt(e.target.value)})} className="p-2 rounded border" />

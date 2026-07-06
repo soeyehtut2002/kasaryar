@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useNavigate } from 'react-router-dom';
 import {
   DollarSign,
@@ -63,6 +64,7 @@ interface DashboardData {
 export const AdminDashboard: React.FC = () => {
   const { user, token, loading: authLoading } = useAuth();
   const { t } = useLanguage();
+  const { formatPrice } = useCurrency();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'packages' | 'chat' | 'cms'>('overview');
@@ -443,7 +445,7 @@ export const AdminDashboard: React.FC = () => {
           {/* Stats Widgets */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: t('totalRevenue'), val: `$${Number(data.stats.totalRevenue).toFixed(2)}`, desc: 'Completed checkouts', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+              { label: t('totalRevenue'), val: formatPrice(data.stats.totalRevenue), desc: 'Completed checkouts', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
               { label: t('totalTxns'), val: data.stats.totalOrders, desc: 'Guest + Member checkout orders', icon: ShoppingBag, color: 'text-primary-500 dark:text-primary-400 bg-primary-500/10 border-primary-500/20' },
               { label: t('registeredCustomers'), val: data.stats.totalUsers, desc: 'Excluding admin profiles', icon: Users, color: 'text-accent-600 dark:text-accent-400 bg-accent-500/10 border-accent-500/20' },
               { label: t('activeGames'), val: data.stats.totalGames, desc: 'Games listing in catalog', icon: Gamepad2, color: 'text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20' }
@@ -506,7 +508,7 @@ export const AdminDashboard: React.FC = () => {
                           <td className="p-4">{order.itemPackage.name}</td>
                           <td className="p-4 font-mono">{order.gameUserId}</td>
                           <td className="p-4 font-bold text-primary-600 dark:text-primary-400">
-                            ${Number(order.amountPaid).toFixed(2)}
+                            {formatPrice(order.amountPaid)}
                             <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">{order.paymentMethod}</span>
                           </td>
                           <td className="p-4">

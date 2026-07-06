@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, ShieldAlert, Calendar, History, ShoppingBag, Loader2 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ interface Order {
 export const UserDashboard: React.FC = () => {
   const { user, token, loading: authLoading } = useAuth();
   const { t } = useLanguage();
+  const { formatPrice } = useCurrency();
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState<Order[]>([]);
@@ -174,7 +176,7 @@ export const UserDashboard: React.FC = () => {
                         {order.gameUserId} {order.zoneId ? `(${order.zoneId})` : ''}
                       </td>
                       <td className="p-4 font-bold text-primary-600 dark:text-primary-400">
-                        ${Number(order.amountPaid).toFixed(2)}
+                        {formatPrice(order.amountPaid)}
                         <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">
                           {order.paymentMethod}
                         </span>

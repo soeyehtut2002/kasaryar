@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { AlertCircle, ChevronLeft, ChevronRight, Zap, Flame, Gift } from 'lucide-react';
 
 interface Game {
@@ -57,6 +58,7 @@ const DEFAULT_SPECIAL_PROMO = {
 
 export const Landing: React.FC = () => {
   const { t, language } = useLanguage();
+  const { formatPrice } = useCurrency();
   const mm = language === 'mm';
 
   const [games, setGames] = useState<Game[]>([]);
@@ -221,9 +223,9 @@ export const Landing: React.FC = () => {
                     <p className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1 line-clamp-1">{fs.itemPackage?.name}</p>
                     <div className="flex items-center justify-center gap-2">
                       <p className="text-red-500 font-black text-sm">
-                        ${((fs.itemPackage?.price || 0) * (1 - fs.discountPercentage / 100)).toFixed(2)}
+                        {formatPrice((fs.itemPackage?.price || 0) * (1 - fs.discountPercentage / 100))}
                       </p>
-                      <p className="text-[10px] text-slate-400 line-through">${fs.itemPackage?.price}</p>
+                      <p className="text-[10px] text-slate-400 line-through">{formatPrice(fs.itemPackage?.price)}</p>
                     </div>
                   </div>
                 </Link>
@@ -241,8 +243,8 @@ export const Landing: React.FC = () => {
                   <div className="p-3 text-center">
                     <p className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1">{fs.name}</p>
                     <div className="flex items-center justify-center gap-2">
-                      <p className="text-red-500 font-black text-sm">${fs.price.toFixed(2)}</p>
-                      <p className="text-[10px] text-slate-400 line-through">${fs.originalPrice.toFixed(2)}</p>
+                      <p className="text-red-500 font-black text-sm">{formatPrice(fs.price)}</p>
+                      <p className="text-[10px] text-slate-400 line-through">{formatPrice(fs.originalPrice)}</p>
                     </div>
                   </div>
                 </div>

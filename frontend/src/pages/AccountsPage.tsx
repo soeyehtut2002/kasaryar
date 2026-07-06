@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import {
   Star, CheckCircle, AlertTriangle, Award, Medal, Hexagon,
   MessageCircle, Search, Crown, Swords, Zap, Users
@@ -36,7 +37,7 @@ const LISTINGS: AccountListing[] = [
     id: 1, game: 'MLBB', seller: 'ProSeller_99', rating: 4.9, reviewCount: 128,
     rank: 'Mythical Glory', rankIcon: <Crown size={18} className="text-amber-400" />, level: 305,
     heroes: 120, skins: 85,
-    price: 65000, verified: true, hot: true,
+    price: 15, verified: true, hot: true,
     badge: 'TOP SELLER', badgeColor: 'bg-amber-500',
     description: 'Mythical Glory account with 85 rare skins including collector items. All heroes unlocked.',
     descriptionMm: 'Collector skins 85 ခုပါသော Mythical Glory အကောင့်။ Hero အားလုံးဖွင့်ထားသည်။',
@@ -45,9 +46,9 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 2, game: 'MLBB', seller: 'MLBBStore_MM', rating: 4.7, reviewCount: 64,
-    rank: 'Mythic', rankIcon: <Hexagon size={18} className="text-purple-400" />, level: 222,
-    heroes: 80, skins: 45,
-    price: 35000, verified: true, hot: false,
+    rank: 'Crown', rankIcon: <Hexagon size={18} className="text-purple-400" />, level: 68,
+    outfits: 65,
+    price: 10, verified: true, hot: false,
     badge: 'VERIFIED', badgeColor: 'bg-emerald-500',
     description: 'Solid Mythic account with many legendary skins. Great value for money.',
     descriptionMm: 'Legendary skin များပါသော Mythic အကောင့်။ ကောင်းမွန်သောတန်ဖိုး။',
@@ -58,7 +59,7 @@ const LISTINGS: AccountListing[] = [
     id: 3, game: 'MLBB', seller: 'GalaxyAcc', rating: 4.5, reviewCount: 41,
     rank: 'Legend', rankIcon: <Star size={18} className="text-emerald-400" />, level: 155,
     heroes: 55, skins: 22,
-    price: 18000, verified: false, hot: false,
+    price: 5, verified: false, hot: false,
     badge: 'BUDGET', badgeColor: 'bg-sky-500',
     description: 'Good Legend rank account, perfect for beginners looking to skip the early grind.',
     descriptionMm: 'Legend rank အကောင့်၊ ကစားမှုစတင်သူများအတွက် ကောင်းမွန်သည်။',
@@ -67,9 +68,9 @@ const LISTINGS: AccountListing[] = [
   },
   {
     id: 4, game: 'PUBGM', seller: 'PUBGKing_01', rating: 4.8, reviewCount: 97,
-    rank: 'Conqueror', rankIcon: <Crown size={18} className="text-red-400" />, level: 80,
-    characters: 5, outfits: 60,
-    price: 75000, verified: true, hot: true,
+    rank: 'Conqueror', rankIcon: <Crown size={18} className="text-amber-400" />, level: 85,
+    outfits: 120,
+    price: 20, verified: true, hot: true,
     badge: 'TOP SELLER', badgeColor: 'bg-amber-500',
     description: 'Conqueror account with 60+ rare outfits, Glacier M416 and exclusive set items.',
     descriptionMm: 'Outfit 60+ ခု၊ Glacier M416 နှင့် exclusive set ပါသော Conqueror အကောင့်။',
@@ -102,6 +103,7 @@ const LISTINGS: AccountListing[] = [
 
 export const AccountsPage: React.FC = () => {
   const { language } = useLanguage();
+  const { formatPrice } = useCurrency();
   const mm = language === 'mm';
   const [activeGame, setActiveGame] = useState<GameTab>('MLBB');
   const [searchQ, setSearchQ] = useState('');
@@ -279,8 +281,7 @@ export const AccountsPage: React.FC = () => {
                 <div>
                   <p className="text-[9px] text-slate-400 mb-0.5">{mm ? 'ရောင်းဈေး' : 'Price'}</p>
                   <p className="text-base font-black text-slate-800 dark:text-white">
-                    {item.price.toLocaleString()}
-                    <span className="text-[10px] font-semibold text-slate-400 ml-1">MMK</span>
+                    {formatPrice(item.price)}
                   </p>
                 </div>
                 <button

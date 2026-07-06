@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { AlertCircle, ArrowLeft, CheckCircle2, ShieldCheck, X } from 'lucide-react';
 
 interface Package {
@@ -27,6 +28,7 @@ export const GameDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { token } = useAuth();
   const { t } = useLanguage();
+  const { formatPrice } = useCurrency();
   const navigate = useNavigate();
 
   const [game, setGame] = useState<Game | null>(null);
@@ -275,14 +277,14 @@ export const GameDetail: React.FC = () => {
                       {pkg.name}
                     </span>
                     <div className="mt-1 text-right">
-                      {pkg.originalPrice && (
-                        <span className="text-[8px] text-slate-400 dark:text-slate-500 line-through mr-1 block">
-                          ${Number(pkg.originalPrice).toFixed(2)}
+                        {pkg.originalPrice && (
+                          <span className="text-xs text-slate-400 line-through">
+                            {formatPrice(pkg.originalPrice)}
+                          </span>
+                        )}
+                        <span className="font-extrabold text-primary-500 text-sm">
+                          {formatPrice(pkg.price)}
                         </span>
-                      )}
-                      <span className="font-extrabold text-[11px] text-primary-500 dark:text-primary-400">
-                        ${Number(pkg.price).toFixed(2)}
-                      </span>
                     </div>
                   </button>
                 ))}
@@ -405,7 +407,7 @@ export const GameDetail: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{t('totalPrice')}</span>
-                  <span className="font-extrabold text-primary-500 text-sm">${Number(selectedPackage?.price).toFixed(2)}</span>
+                  <span className="font-extrabold text-primary-500 text-sm">{formatPrice(selectedPackage?.price)}</span>
                 </div>
               </div>
             </div>
