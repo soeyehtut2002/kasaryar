@@ -32,7 +32,7 @@ export const getAccessToken = async (): Promise<string> => {
     });
 
     if (response.data && response.data.token) {
-      cachedToken = response.data.token;
+      cachedToken = response.data.token as string;
       // Token is valid for 2 hours, we'll cache it for 1 hour and 50 minutes to be safe
       tokenExpiry = Date.now() + (110 * 60 * 1000); 
       return cachedToken;
