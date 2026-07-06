@@ -182,7 +182,13 @@ export const UserDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className="px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
+                        <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wider rounded uppercase border ${
+                          order.status === 'PENDING' 
+                            ? 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20' 
+                            : order.status === 'COMPLETED' || order.status === 'SUCCESS' 
+                            ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                            : 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'
+                        }`}>
                           {order.status}
                         </span>
                       </td>

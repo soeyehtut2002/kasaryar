@@ -497,14 +497,14 @@ export const GameDetail: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/60 dark:bg-dark-950/80 backdrop-blur-sm">
           <div className="glass-card rounded-2xl border border-slate-200 dark:border-dark-800 max-w-sm w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 bg-white dark:bg-dark-900/95">
             <div className="p-4 text-center border-b border-slate-200 dark:border-dark-800 bg-slate-50 dark:bg-dark-900/50">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3 text-emerald-500 dark:text-emerald-400">
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto mb-3 text-amber-500 dark:text-amber-400">
                 <CheckCircle2 size={20} />
               </div>
               <h3 className="font-extrabold text-slate-800 dark:text-white text-sm">
-                {t('paymentSuccess')}
+                Payment Pending Verification
               </h3>
               <p className="text-slate-550 dark:text-slate-400 text-[10px] mt-0.5">
-                {t('receiptPrompt')}
+                Your payment slip has been uploaded. An admin will verify and complete your order shortly.
               </p>
             </div>
 
