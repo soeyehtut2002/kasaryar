@@ -43,7 +43,7 @@ export const AdminCMS: React.FC = () => {
 
   // Handle Banner Submit
   const [bannerForm, setBannerForm] = useState({
-    id: '', title: '', subtitle: '', imageUrl: '', colorTheme: 'from-blue-600/90 to-indigo-900/90', isActive: true, orderIndex: 0
+    id: '', title: '', subtitle: '', imageUrl: '', link: '', colorTheme: 'from-blue-600/90 to-indigo-900/90', isActive: true, orderIndex: 0
   });
   const [showBannerForm, setShowBannerForm] = useState(false);
   
@@ -58,7 +58,7 @@ export const AdminCMS: React.FC = () => {
       body: JSON.stringify(bannerForm)
     });
     setShowBannerForm(false);
-    setBannerForm({ id: '', title: '', subtitle: '', imageUrl: '', colorTheme: 'from-blue-600/90 to-indigo-900/90', isActive: true, orderIndex: 0 });
+    setBannerForm({ id: '', title: '', subtitle: '', imageUrl: '', link: '', colorTheme: 'from-blue-600/90 to-indigo-900/90', isActive: true, orderIndex: 0 });
     loadData();
   };
 
@@ -117,7 +117,7 @@ export const AdminCMS: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Hero Promo Banners</h2>
           <button onClick={() => {
-            setBannerForm({ id: '', title: '', subtitle: '', imageUrl: '', colorTheme: 'from-blue-600/90 to-indigo-900/90', isActive: true, orderIndex: 0 });
+            setBannerForm({ id: '', title: '', subtitle: '', imageUrl: '', link: '', colorTheme: 'from-blue-600/90 to-indigo-900/90', isActive: true, orderIndex: 0 });
             setShowBannerForm(true);
           }} className="px-3 py-1.5 bg-primary-500 text-white rounded-lg flex items-center gap-1 text-sm">
             <Plus size={14} /> Add Banner
@@ -142,6 +142,7 @@ export const AdminCMS: React.FC = () => {
                   }} />
                 </label>
               </div>
+              <input type="text" placeholder="Link URL (Optional, e.g. /game/valorant)" value={bannerForm.link || ''} onChange={e => setBannerForm({...bannerForm, link: e.target.value})} className="p-2 rounded border" />
               <input required type="text" placeholder="Color Theme classes" value={bannerForm.colorTheme} onChange={e => setBannerForm({...bannerForm, colorTheme: e.target.value})} className="p-2 rounded border" />
             </div>
             <div className="flex justify-end gap-2">

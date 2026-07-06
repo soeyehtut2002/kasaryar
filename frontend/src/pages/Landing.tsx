@@ -153,9 +153,15 @@ export const Landing: React.FC = () => {
                 <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-md drop-shadow font-medium mb-6">
                   {banner.subtitle}
                 </p>
-                <button className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer">
-                  {mm ? 'ယခုဝယ်မည်' : 'Top Up Now'}
-                </button>
+                {banner.link ? (
+                  <Link to={banner.link} className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer inline-block">
+                    {mm ? 'ယခုဝယ်မည်' : 'Top Up Now'}
+                  </Link>
+                ) : (
+                  <button className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer">
+                    {mm ? 'ယခုဝယ်မည်' : 'Top Up Now'}
+                  </button>
+                )}
               </div>
             </div>
           ))}

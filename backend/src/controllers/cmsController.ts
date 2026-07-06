@@ -16,9 +16,9 @@ export const getPromoBanners = async (req: any, res: any) => {
 
 export const createPromoBanner = async (req: any, res: any) => {
   try {
-    const { title, subtitle, imageUrl, colorTheme, orderIndex, isActive } = req.body;
+    const { title, subtitle, imageUrl, colorTheme, link, orderIndex, isActive } = req.body;
     const banner = await prisma.promoBanner.create({
-      data: { title, subtitle, imageUrl, colorTheme, orderIndex, isActive },
+      data: { title, subtitle, imageUrl, colorTheme, link, orderIndex, isActive },
     });
     res.status(201).json({ status: 'success', data: { banner } });
   } catch (error) {
@@ -29,10 +29,10 @@ export const createPromoBanner = async (req: any, res: any) => {
 export const updatePromoBanner = async (req: any, res: any) => {
   try {
     const { id } = req.params;
-    const { title, subtitle, imageUrl, colorTheme, orderIndex, isActive } = req.body;
+    const { title, subtitle, imageUrl, colorTheme, link, orderIndex, isActive } = req.body;
     const banner = await prisma.promoBanner.update({
       where: { id },
-      data: { title, subtitle, imageUrl, colorTheme, orderIndex, isActive },
+      data: { title, subtitle, imageUrl, colorTheme, link, orderIndex, isActive },
     });
     res.json({ status: 'success', data: { banner } });
   } catch (error) {

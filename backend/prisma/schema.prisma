@@ -107,6 +107,7 @@ model PromoBanner {
   subtitle   String
   imageUrl   String
   colorTheme String   @default("from-blue-600/90 to-indigo-900/90")
+  link       String?  
   isActive   Boolean  @default(true)
   orderIndex Int      @default(0)
   createdAt  DateTime @default(now())
