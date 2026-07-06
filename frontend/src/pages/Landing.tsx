@@ -160,6 +160,7 @@ export const Landing: React.FC = () => {
                 <button 
                   onClick={() => {
                     if (banner.link) navigate(banner.link);
+                    else document.getElementById('games')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer"
                 >
@@ -287,7 +288,7 @@ export const Landing: React.FC = () => {
       )}
 
       {/* ── 4. Popular Games Grid ── */}
-      <div className="mb-6">
+      <div id="games" className="mb-6">
         <div className="flex items-center gap-2 mb-6">
           <div className="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center">
             <Flame size={18} className="text-primary-500" />
