@@ -10,6 +10,8 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { GameDetail } from './pages/GameDetail';
 import { NewsPage } from './pages/NewsPage';
 import { AccountsPage } from './pages/AccountsPage';
+import { TermsPage } from './pages/TermsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -35,6 +37,8 @@ function App() {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/news" element={<NewsPage />} />
                     <Route path="/accounts" element={<AccountsPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
                   </Routes>
                 </main>
                 <Footer />

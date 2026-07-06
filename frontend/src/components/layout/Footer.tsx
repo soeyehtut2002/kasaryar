@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const Footer: React.FC = () => {
@@ -17,8 +18,8 @@ export const Footer: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-6 text-sm">
-            <a href="#" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Privacy Policy</a>
+            <Link to="/terms" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Privacy Policy</Link>
             <button
               onClick={(e) => {
                 e.preventDefault();

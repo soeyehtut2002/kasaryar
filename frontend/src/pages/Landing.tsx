@@ -52,7 +52,7 @@ const DEFAULT_SPECIAL_PROMO = {
   title: 'Get 5% Cashback with KBZPay',
   description: 'Enjoy 5% cashback on all top-ups every Friday when you pay using KBZPay.',
   buttonText: 'Learn More',
-  buttonLink: '#',
+  buttonLink: '/news',
   isActive: true,
 };
 
