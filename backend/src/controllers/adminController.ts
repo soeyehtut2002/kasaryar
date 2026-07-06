@@ -185,7 +185,7 @@ export const deleteGame = async (req: Request, res: Response, next: NextFunction
 
 export const createPackage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { gameId, name, price, originalPrice, diamonds, isAvailable } = req.body;
+    const { gameId, name, price, originalPrice, diamonds, isAvailable, providerCode } = req.body;
 
     if (!gameId || !name || price === undefined || diamonds === undefined) {
       return next(new AppError('Please provide gameId, name, price and diamonds count', 400));
@@ -204,6 +204,7 @@ export const createPackage = async (req: Request, res: Response, next: NextFunct
         originalPrice: originalPrice || null,
         diamonds: parseInt(diamonds, 10),
         isAvailable: isAvailable !== undefined ? isAvailable : true,
+        providerCode: providerCode || null,
       },
     });
 
@@ -219,7 +220,7 @@ export const createPackage = async (req: Request, res: Response, next: NextFunct
 export const updatePackage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const { name, price, originalPrice, diamonds, isAvailable } = req.body;
+    const { name, price, originalPrice, diamonds, isAvailable, providerCode } = req.body;
 
     const existingPackage = await prisma.itemPackage.findUnique({ where: { id } });
     if (!existingPackage) {
@@ -234,6 +235,7 @@ export const updatePackage = async (req: Request, res: Response, next: NextFunct
         originalPrice: originalPrice !== undefined ? originalPrice : undefined,
         diamonds: diamonds !== undefined ? parseInt(diamonds, 10) : undefined,
         isAvailable,
+        providerCode: providerCode !== undefined ? providerCode : undefined,
       },
     });
 

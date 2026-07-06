@@ -183,12 +183,12 @@ export const AdminDashboard: React.FC = () => {
   const [showGameForm, setShowGameForm] = useState(false);
 
   const [packageForm, setPackageForm] = useState({
-    id: '',
     gameId: '',
     name: '',
     price: '',
     originalPrice: '',
-    diamonds: ''
+    diamonds: '',
+    providerCode: ''
   });
   const [showPackageForm, setShowPackageForm] = useState(false);
 
@@ -336,7 +336,8 @@ export const AdminDashboard: React.FC = () => {
           name: packageForm.name,
           price: parseFloat(packageForm.price),
           originalPrice: packageForm.originalPrice ? parseFloat(packageForm.originalPrice) : undefined,
-          diamonds: parseInt(packageForm.diamonds, 10)
+          diamonds: parseInt(packageForm.diamonds, 10),
+          providerCode: packageForm.providerCode || undefined
         })
       });
       const resData = await res.json();
@@ -344,12 +345,12 @@ export const AdminDashboard: React.FC = () => {
       if (res.ok) {
         setShowPackageForm(false);
         setPackageForm({
-          id: '',
           gameId: '',
           name: '',
           price: '',
           originalPrice: '',
-          diamonds: ''
+          diamonds: '',
+          providerCode: ''
         });
         await fetchGames();
         await fetchDashboardData();
@@ -448,7 +449,7 @@ export const AdminDashboard: React.FC = () => {
               { label: t('totalRevenue'), val: formatPrice(data.stats.totalRevenue), desc: 'Completed checkouts', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
               { label: t('totalTxns'), val: data.stats.totalOrders, desc: 'Guest + Member checkout orders', icon: ShoppingBag, color: 'text-primary-500 dark:text-primary-400 bg-primary-500/10 border-primary-500/20' },
               { label: t('registeredCustomers'), val: data.stats.totalUsers, desc: 'Excluding admin profiles', icon: Users, color: 'text-accent-600 dark:text-accent-400 bg-accent-500/10 border-accent-500/20' },
-              { label: t('activeGames'), val: data.stats.totalGames, desc: 'Games listing in catalog', icon: Gamepad2, color: 'text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20' }
+              { label: t('activeGames'), val: data.stats.totalGames, desc: 'Games listing in catalog', icon: Gamepad2, color: 'text-purple-600 dark:purple-400 bg-purple-500/10 border-purple-500/20' }
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
@@ -838,6 +839,20 @@ export const AdminDashboard: React.FC = () => {
                       className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Provider Product Code (Optional)</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="w-full pl-4 pr-4 py-2.5 bg-slate-50 dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm outline-none dark:text-white"
+                      placeholder="e.g. MLBB_10"
+                      value={packageForm.providerCode}
+                      onChange={(e) => setPackageForm({ ...packageForm, providerCode: e.target.value })}
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">If using an external API like GalaxyLink, enter the product code here.</p>
                 </div>
 
                 <div className="flex gap-2 justify-end pt-4 border-t border-slate-200 dark:border-dark-800">

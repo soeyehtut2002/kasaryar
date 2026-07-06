@@ -53,6 +53,7 @@ model ItemPackage {
   price         Decimal  @db.Decimal(10, 2)
   originalPrice Decimal? @db.Decimal(10, 2) 
   diamonds      Int      
+  providerCode  String?
   isAvailable   Boolean  @default(true)
   orders        Order[]
   flashSales    FlashSale[]
@@ -74,6 +75,7 @@ model Order {
   amountPaid    Decimal     @db.Decimal(10, 2)
   paymentMethod String      
   status        OrderStatus @default(PENDING)
+  providerOrderId String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
