@@ -216,12 +216,14 @@ export const AdminCMS: React.FC = () => {
 
         <div className="grid grid-cols-4 gap-4">
           {flashSales.map(f => (
-            <div key={f.id} className="border p-4 rounded-xl bg-white flex flex-col items-center">
-              {f.customIconUrl ? <img src={f.customIconUrl} className="w-16 h-16 object-contain mb-2" /> : <div className="w-16 h-16 bg-slate-200 rounded-full mb-2" />}
-              <p className="font-bold text-center text-sm">{f.itemPackage?.name}</p>
-              <p className="text-red-500 text-xs">-{f.discountPercentage}%</p>
-              <div className="flex gap-2 mt-2">
-                 <button onClick={() => deleteFlashSale(f.id)} className="p-1 bg-red-100 text-red-500 rounded"><Trash2 size={12}/></button>
+            <div key={f.id} className="border rounded-xl bg-white flex flex-col items-center overflow-hidden">
+              {f.customIconUrl ? <img src={f.customIconUrl} className="w-full h-24 object-cover mb-2" /> : <div className="w-full h-24 bg-slate-200 mb-2" />}
+              <div className="p-3 flex flex-col items-center w-full">
+                <p className="font-bold text-center text-sm">{f.itemPackage?.name}</p>
+                <p className="text-red-500 text-xs">-{f.discountPercentage}%</p>
+                <div className="flex gap-2 mt-2">
+                   <button onClick={() => deleteFlashSale(f.id)} className="p-1.5 bg-red-100 hover:bg-red-200 text-red-500 rounded"><Trash2 size={14}/></button>
+                </div>
               </div>
             </div>
           ))}

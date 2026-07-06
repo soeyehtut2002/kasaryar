@@ -209,7 +209,7 @@ export const Landing: React.FC = () => {
                 <Link to={fs.itemPackage?.game?.slug ? `/game/${fs.itemPackage.game.slug}` : '#'} key={fs.id} className="bg-white dark:bg-dark-900 rounded-xl border border-red-100 dark:border-red-900/30 overflow-hidden group cursor-pointer hover:shadow-lg transition-all">
                   <div className="relative h-28 bg-gradient-to-br from-red-50 to-orange-50 dark:from-dark-800 dark:to-dark-800 flex items-center justify-center overflow-hidden">
                     {fs.customIconUrl ? (
-                      <img src={fs.customIconUrl} alt="Flash Sale Item" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" />
+                      <img src={fs.customIconUrl} alt="Flash Sale Item" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                     ) : (
                       <Gift size={40} className="text-red-400 group-hover:scale-110 transition-transform duration-300" />
                     )}
