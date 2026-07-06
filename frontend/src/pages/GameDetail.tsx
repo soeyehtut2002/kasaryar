@@ -276,15 +276,15 @@ export const GameDetail: React.FC = () => {
                     <span className="font-bold text-xs text-slate-800 dark:text-slate-200 line-clamp-1">
                       {pkg.name}
                     </span>
-                    <div className="mt-1 text-right">
-                        {pkg.originalPrice && (
-                          <span className="text-xs text-slate-400 line-through">
-                            {formatPrice(pkg.originalPrice)}
-                          </span>
-                        )}
-                        <span className="font-extrabold text-primary-500 text-sm">
-                          {formatPrice(pkg.price)}
+                    <div className="mt-1 text-right flex flex-col items-end justify-end">
+                      {pkg.originalPrice && (
+                        <span className="text-[10px] text-slate-400 line-through whitespace-nowrap">
+                          {formatPrice(pkg.originalPrice)}
                         </span>
+                      )}
+                      <span className="font-extrabold text-primary-500 text-[11px] sm:text-xs whitespace-nowrap mt-0.5">
+                        {formatPrice(pkg.price)}
+                      </span>
                     </div>
                   </button>
                 ))}
