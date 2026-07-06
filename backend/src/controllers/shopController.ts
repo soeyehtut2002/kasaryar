@@ -13,6 +13,13 @@ export const getGames = async (req: Request, res: Response, next: NextFunction) 
         category: true,
         thumbnailUrl: true,
         description: true,
+        packages: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          }
+        }
       },
       orderBy: { name: 'asc' },
     });
