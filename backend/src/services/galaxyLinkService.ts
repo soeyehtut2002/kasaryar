@@ -36,7 +36,7 @@ export const getAuthToken = async (): Promise<string> => {
       })
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     
     // API Response မှ token ရယူခြင်း
     if (!response.ok || !data.token) {
@@ -75,7 +75,7 @@ export const validateGameAccount = async (gameSlug: string, gameUserId: string, 
       })
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     return data; // returns: { valid: boolean, nickname: string }
   } catch (error) {
     console.error('GalaxyLink validation check failed:', error);
@@ -112,7 +112,7 @@ export const placeTopupOrder = async (orderData: {
       body: JSON.stringify(body)
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     return data;
     // Returns: { status: 'SUCCESS' | 'PENDING' | 'FAILED', transaction_id: string }
   } catch (error) {
