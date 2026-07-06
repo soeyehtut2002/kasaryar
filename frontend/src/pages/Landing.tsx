@@ -61,7 +61,6 @@ export const Landing: React.FC = () => {
 
   const [games, setGames] = useState<Game[]>([]);
   const [banners, setBanners] = useState<any[]>(DEFAULT_BANNERS);
-  const [flashSales, setFlashSales] = useState<any[]>([]);
   const [flashSalesRaw, setFlashSalesRaw] = useState<any[]>([]);
   const [specialPromo, setSpecialPromo] = useState<any>(DEFAULT_SPECIAL_PROMO);
 
