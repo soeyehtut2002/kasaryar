@@ -10,9 +10,9 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-xl font-black text-slate-800 dark:text-slate-200 tracking-wider">
-              {t('brandName')}
-            </span>
+            <Link to="/">
+              <img src="/logo.png" alt="Kasar Yar Logo" className="h-10 w-auto object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all" />
+            </Link>
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 text-center md:text-left">
               © {new Date().getFullYear()} {t('brandName')}. All rights reserved. Not affiliated with any game publisher.
             </p>

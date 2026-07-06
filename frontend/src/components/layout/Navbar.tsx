@@ -36,16 +36,8 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-14">
 
           {/* ── Brand ──────────────────────────────────────────────── */}
-          <Link to="/" className="flex items-center gap-1.5" onClick={() => setMobileOpen(false)}>
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center shadow-md shadow-primary-500/30">
-              <Gamepad2 size={14} className="text-white" />
-            </div>
-            <span className="text-base font-black tracking-wide bg-gradient-to-r from-primary-500 to-violet-500 bg-clip-text text-transparent">
-              {t('brandName')}
-            </span>
-            <span className="hidden sm:inline px-1 py-0.5 text-[8px] font-bold tracking-widest text-primary-500 border border-primary-500/30 rounded uppercase bg-primary-500/5">
-              {t('storeTag')}
-            </span>
+          <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+            <img src="/logo.png" alt="Kasar Yar Logo" className="h-10 sm:h-12 w-auto object-contain" />
           </Link>
 
           {/* ── Desktop Nav Links ───────────────────────────────────── */}
