@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { AlertCircle, ChevronLeft, ChevronRight, Zap, Flame, Gift } from 'lucide-react';
@@ -21,6 +21,7 @@ const DEFAULT_BANNERS = [
     subtitle: 'Get 30% bonus diamonds on first recharge this month.',
     imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80',
     colorTheme: 'from-blue-600/90 to-indigo-900/90',
+    link: '/game/mobile-legends-bang-bang',
     isActive: true,
   },
   {
@@ -29,6 +30,7 @@ const DEFAULT_BANNERS = [
     subtitle: 'Exclusive outfits and weapon skins available now.',
     imageUrl: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=1200&q=80',
     colorTheme: 'from-amber-600/90 to-orange-900/90',
+    link: '/game/pubg-mobile',
     isActive: true,
   },
   {
@@ -37,6 +39,7 @@ const DEFAULT_BANNERS = [
     subtitle: 'New Night Market is here. Top up now!',
     imageUrl: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=1200&q=80',
     colorTheme: 'from-red-600/90 to-rose-900/90',
+    link: '/game/valorant',
     isActive: true,
   },
 ];
@@ -59,6 +62,7 @@ const DEFAULT_SPECIAL_PROMO = {
 export const Landing: React.FC = () => {
   const { t, language } = useLanguage();
   const { formatPrice } = useCurrency();
+  const navigate = useNavigate();
   const mm = language === 'mm';
 
   const [games, setGames] = useState<Game[]>([]);
@@ -153,15 +157,14 @@ export const Landing: React.FC = () => {
                 <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-md drop-shadow font-medium mb-6">
                   {banner.subtitle}
                 </p>
-                {banner.link ? (
-                  <Link to={banner.link} className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer inline-block">
-                    {mm ? 'ယခုဝယ်မည်' : 'Top Up Now'}
-                  </Link>
-                ) : (
-                  <button className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer">
-                    {mm ? 'ယခုဝယ်မည်' : 'Top Up Now'}
-                  </button>
-                )}
+                <button 
+                  onClick={() => {
+                    if (banner.link) navigate(banner.link);
+                  }}
+                  className="w-max px-6 py-2.5 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-100 transition-colors shadow-lg cursor-pointer"
+                >
+                  {mm ? 'ယခုဝယ်မည်' : 'Top Up Now'}
+                </button>
               </div>
             </div>
           ))}
