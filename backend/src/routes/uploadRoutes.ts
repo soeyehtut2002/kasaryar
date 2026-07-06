@@ -4,7 +4,10 @@ import { protect, restrictTo } from '../middleware/auth';
 
 const router = express.Router();
 
-// Only admin can upload files
+// Public route for payment slips
+router.post('/slip', upload.single('image'), uploadImage);
+
+// Only admin can upload other files
 router.use(protect);
 router.use(restrictTo('ADMIN'));
 

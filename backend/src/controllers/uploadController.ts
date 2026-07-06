@@ -1,9 +1,25 @@
 import { Request, Response } from 'express';
 import { AppError } from '../utils/appError';
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
-// Use memory storage instead of disk since we're forwarding to ImgBB
-const storage = multer.memoryStorage();
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, '../../../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   if (file.mimetype.startsWith('image/')) {
@@ -29,43 +45,21 @@ export const uploadImage = async (req: Request, res: Response) => {
     });
   }
 
-  const apiKey = process.env.IMGBB_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'IMGBB_API_KEY is not configured on the server.'
-    });
-  }
-
   try {
-    // ImgBB API expects a base64 encoded string or a multipart form data
-    const base64Image = req.file.buffer.toString('base64');
-    
-    const formData = new URLSearchParams();
-    formData.append('image', base64Image);
-
-    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    const result = (await response.json()) as any;
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.error?.message || 'Failed to upload to ImgBB');
-    }
+    // Construct local URL
+    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     res.status(200).json({
       status: 'success',
       data: {
-        url: result.data.url
+        url: fileUrl
       }
     });
   } catch (error: any) {
-    console.error('ImgBB Upload Error:', error);
+    console.error('Upload Error:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Failed to upload image to Cloud Storage',
+      message: 'Failed to upload image locally',
       error: error.message
     });
   }

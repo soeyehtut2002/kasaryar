@@ -44,6 +44,7 @@ export const GameDetail: React.FC = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState<any | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [slipFile, setSlipFile] = useState<File | null>(null);
 
   const isMLBB = slug === 'mobile-legends';
 
@@ -91,8 +92,30 @@ export const GameDetail: React.FC = () => {
   };
 
   const handleConfirmPurchase = async () => {
+    if (!slipFile) {
+      setFormError('Please upload your payment slip');
+      return;
+    }
+
     setCheckoutLoading(true);
     try {
+      // 1. Upload Slip First
+      const formData = new FormData();
+      formData.append('image', slipFile);
+
+      const uploadRes = await fetch('/api/upload/slip', {
+        method: 'POST',
+        body: formData
+      });
+      const uploadData = await uploadRes.json();
+      
+      if (!uploadRes.ok) {
+        throw new Error(uploadData.message || 'Failed to upload slip');
+      }
+
+      const slipUrl = uploadData.data.url;
+
+      // 2. Create Order with Slip
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -104,7 +127,8 @@ export const GameDetail: React.FC = () => {
           packageId: selectedPackage?.id,
           gameUserId,
           zoneId: isMLBB ? zoneId : undefined,
-          paymentMethod: selectedPayment
+          paymentMethod: selectedPayment,
+          slipUrl
         })
       });
 
@@ -112,6 +136,7 @@ export const GameDetail: React.FC = () => {
       if (res.ok && data.status === 'success') {
         setCheckoutSuccess(data.data.order);
         setShowConfirmModal(false);
+        setSlipFile(null);
       } else {
         setFormError(data.message || 'Checkout failed');
       }
@@ -303,9 +328,9 @@ export const GameDetail: React.FC = () => {
               </h3>
               <div className="space-y-2">
                 {[
-                  { id: 'E-Wallet', name: 'WavePay / KBZPay / MytelPay', fee: 'No fee', icon: '📱' },
-                  { id: 'Card', name: 'Visa / Mastercard / JCB', fee: '1.5% fee', icon: '💳' },
-                  { id: 'Bank Transfer', name: 'KBZ / CB / AYA Direct', fee: 'No fee', icon: '🏦' },
+                  { id: 'KPay', name: 'KBZPay (KPay)', fee: 'No fee', icon: '📱' },
+                  { id: 'WavePay', name: 'WavePay', fee: 'No fee', icon: '📱' },
+                  { id: 'PromptPay', name: 'Thai PromptPay', fee: 'No fee', icon: '🏦' },
                 ].map((payment) => (
                   <button
                     key={payment.id}
@@ -409,6 +434,35 @@ export const GameDetail: React.FC = () => {
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{t('totalPrice')}</span>
                   <span className="font-extrabold text-primary-500 text-sm">{formatPrice(selectedPackage?.price)}</span>
                 </div>
+              </div>
+
+              {/* QR Code and Slip Upload section */}
+              <div className="bg-slate-50 dark:bg-dark-900 rounded-lg p-4 border border-slate-200 dark:border-dark-800 text-center">
+                <p className="text-xs font-bold text-slate-800 dark:text-white mb-2">Scan to Pay ({selectedPayment})</p>
+                <div className="w-32 h-32 bg-white rounded-lg border-2 border-dashed border-slate-300 dark:border-dark-700 mx-auto mb-3 flex items-center justify-center relative overflow-hidden">
+                   {/* Fallback QR placeholder if specific images aren't provided */}
+                   <span className="text-slate-400 text-[10px] absolute inset-0 flex items-center justify-center text-center p-2">Bank QR Code</span>
+                </div>
+                
+                <label className="block w-full">
+                  <span className="sr-only">Choose slip image</span>
+                  <input type="file" accept="image/*" 
+                    onChange={(e) => setSlipFile(e.target.files ? e.target.files[0] : null)}
+                    className="block w-full text-xs text-slate-500 dark:text-slate-400
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-xs file:font-semibold
+                      file:bg-primary-50 file:text-primary-700
+                      dark:file:bg-primary-500/10 dark:file:text-primary-400
+                      hover:file:bg-primary-100 dark:hover:file:bg-primary-500/20
+                      cursor-pointer border border-slate-200 dark:border-dark-800 rounded-full"
+                  />
+                </label>
+                {slipFile && (
+                  <p className="text-[10px] text-emerald-500 mt-2 flex items-center justify-center gap-1">
+                    <CheckCircle2 size={12} /> Slip selected
+                  </p>
+                )}
               </div>
             </div>
 

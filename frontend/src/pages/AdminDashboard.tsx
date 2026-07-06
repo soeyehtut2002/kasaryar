@@ -33,6 +33,7 @@ interface Order {
   status: string;
   createdAt: string;
   gameUserId: string;
+  slipUrl?: string;
   user?: { username: string; email: string };
   game: { name: string };
   itemPackage: { name: string };
@@ -191,6 +192,7 @@ export const AdminDashboard: React.FC = () => {
     providerCode: ''
   });
   const [showPackageForm, setShowPackageForm] = useState(false);
+  const [updatingOrder, setUpdatingOrder] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
     if (!token) return;
@@ -207,6 +209,52 @@ export const AdminDashboard: React.FC = () => {
     } catch (err) {
       console.error(err);
       setError('Network error loading admin metrics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApproveOrder = async (id: string) => {
+    if (!window.confirm('Are you sure you want to approve this order?')) return;
+    setUpdatingOrder(id);
+    try {
+      const res = await fetch(`/api/admin/orders/${id}/approve`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const json = await res.json();
+      if (res.ok && json.status === 'success') {
+        fetchDashboardData();
+      } else {
+        alert(json.message || 'Failed to approve order');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while approving order');
+    } finally {
+      setUpdatingOrder(null);
+    }
+  };
+
+  const handleRejectOrder = async (id: string) => {
+    if (!window.confirm('Are you sure you want to reject this order?')) return;
+    setUpdatingOrder(id);
+    try {
+      const res = await fetch(`/api/admin/orders/${id}/reject`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const json = await res.json();
+      if (res.ok && json.status === 'success') {
+        fetchDashboardData();
+      } else {
+        alert(json.message || 'Failed to reject order');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while rejecting order');
+    } finally {
+      setUpdatingOrder(null);
     }
   };
 
@@ -488,7 +536,9 @@ export const AdminDashboard: React.FC = () => {
                         <th className="p-4">Package</th>
                         <th className="p-4">Game ID</th>
                         <th className="p-4">Amount</th>
+                        <th className="p-4">Slip</th>
                         <th className="p-4">Status</th>
+                        <th className="p-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-dark-800 text-slate-700 dark:text-slate-300">
@@ -513,9 +563,44 @@ export const AdminDashboard: React.FC = () => {
                             <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">{order.paymentMethod}</span>
                           </td>
                           <td className="p-4">
-                            <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded uppercase">
+                            {order.slipUrl ? (
+                              <a href={order.slipUrl} target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline text-xs flex items-center gap-1">
+                                <span className="w-6 h-6 rounded bg-primary-100 flex items-center justify-center">🖼️</span>
+                                View Slip
+                              </a>
+                            ) : (
+                              <span className="text-[10px] text-slate-400">No Slip</span>
+                            )}
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2 py-0.5 text-[9px] font-bold rounded uppercase ${
+                              order.status === 'COMPLETED' ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' :
+                              order.status === 'PENDING' ? 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20' :
+                              order.status === 'FAILED' ? 'text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20' :
+                              'text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20'
+                            }`}>
                               {order.status}
                             </span>
+                          </td>
+                          <td className="p-4">
+                            {order.status === 'PENDING' && (
+                              <div className="flex gap-2">
+                                <button 
+                                  onClick={() => handleApproveOrder(order.id)}
+                                  disabled={updatingOrder === order.id}
+                                  className="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded shadow transition-colors disabled:opacity-50"
+                                >
+                                  {updatingOrder === order.id ? '...' : 'Approve'}
+                                </button>
+                                <button 
+                                  onClick={() => handleRejectOrder(order.id)}
+                                  disabled={updatingOrder === order.id}
+                                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded shadow transition-colors disabled:opacity-50"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))}

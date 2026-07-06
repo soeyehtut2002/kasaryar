@@ -64,7 +64,7 @@ export const getGameDetail = async (req: Request, res: Response, next: NextFunct
 
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { gameId, packageId, gameUserId, zoneId, paymentMethod } = req.body;
+    const { gameId, packageId, gameUserId, zoneId, paymentMethod, slipUrl } = req.body;
 
     if (!gameId || !packageId || !gameUserId || !paymentMethod) {
       return next(new AppError('Please provide gameId, packageId, gameUserId and paymentMethod', 400));
@@ -86,7 +86,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     const orderNumber = `TXN-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const userId = req.user ? req.user.id : null;
-    const initialStatus = itemPackage.providerCode ? 'PROCESSING' : 'COMPLETED';
+    const initialStatus = 'PENDING'; // All orders now require admin approval via slip verification
 
     let order = await prisma.order.create({
       data: {
@@ -98,6 +98,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
         zoneId: zoneId || null,
         amountPaid: itemPackage.price,
         paymentMethod,
+        slipUrl: slipUrl || null,
         status: initialStatus,
       },
       include: {
@@ -105,39 +106,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
         itemPackage: { select: { name: true, diamonds: true, providerCode: true } },
       },
     });
-
-    if (itemPackage.providerCode) {
-      try {
-        const glResponse = await createTopupOrder(
-          itemPackage.providerCode,
-          gameUserId,
-          zoneId || null,
-          orderNumber
-        );
-        
-        // Update order with provider order ID if available (depends on GL response structure)
-        if (glResponse && glResponse.id) {
-          order = await prisma.order.update({
-            where: { id: order.id },
-            data: { providerOrderId: String(glResponse.id) },
-            include: {
-              game: { select: { name: true, slug: true } },
-              itemPackage: { select: { name: true, diamonds: true, providerCode: true } },
-            },
-          });
-        }
-      } catch (error) {
-        // Mark order as failed if API call fails
-        order = await prisma.order.update({
-          where: { id: order.id },
-          data: { status: 'FAILED' },
-          include: {
-            game: { select: { name: true, slug: true } },
-            itemPackage: { select: { name: true, diamonds: true, providerCode: true } },
-          },
-        });
-      }
-    }
 
     res.status(201).json({
       status: 'success',

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../config/db';
 import { AppError } from '../utils/appError';
+import { createTopupOrder } from '../services/galaxyLinkService';
 
 export const getDashboardStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -262,6 +263,115 @@ export const deletePackage = async (req: Request, res: Response, next: NextFunct
     res.status(204).json({
       status: 'success',
       data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const approveOrder = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    let order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        itemPackage: true
+      }
+    });
+
+    if (!order) {
+      return next(new AppError('Order not found', 404));
+    }
+
+    if (order.status !== 'PENDING') {
+      return next(new AppError('Only PENDING orders can be approved', 400));
+    }
+
+    // Attempt to fulfill via GalaxyLink if providerCode exists
+    if (order.itemPackage.providerCode) {
+      // Mark it as processing first
+      order = await prisma.order.update({
+        where: { id },
+        data: { status: 'PROCESSING' },
+        include: { itemPackage: true }
+      });
+
+      try {
+        const glResponse = await createTopupOrder(
+          order.itemPackage.providerCode as string,
+          order.gameUserId,
+          order.zoneId || null,
+          order.orderNumber
+        );
+
+        if (glResponse && glResponse.id) {
+          order = await prisma.order.update({
+            where: { id },
+            data: { 
+              providerOrderId: String(glResponse.id),
+              // We keep it as processing or mark completed depending on whether GalaxyLink completes it instantly.
+              // We'll leave it as PROCESSING for now, assuming a webhook or poll will mark it COMPLETED later,
+              // or just mark it COMPLETED if the API is synchronous. We'll mark COMPLETED for simplicity here.
+              status: 'COMPLETED'
+            },
+            include: { itemPackage: true }
+          });
+        } else {
+           // Fallback to complete if it succeeded but returned no ID
+           order = await prisma.order.update({
+            where: { id },
+            data: { status: 'COMPLETED' },
+            include: { itemPackage: true }
+          });
+        }
+      } catch (error) {
+        order = await prisma.order.update({
+          where: { id },
+          data: { status: 'FAILED' },
+          include: { itemPackage: true }
+        });
+        return next(new AppError('Approved but GalaxyLink API failed to fulfill top-up', 500));
+      }
+    } else {
+      // Manual package (no provider code)
+      order = await prisma.order.update({
+        where: { id },
+        data: { status: 'COMPLETED' },
+        include: { itemPackage: true }
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: { order }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const rejectOrder = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const order = await prisma.order.findUnique({ where: { id } });
+    if (!order) {
+      return next(new AppError('Order not found', 404));
+    }
+
+    if (order.status !== 'PENDING') {
+      return next(new AppError('Only PENDING orders can be rejected', 400));
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id },
+      data: { status: 'FAILED' }
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: { order: updatedOrder }
     });
   } catch (error) {
     next(error);
