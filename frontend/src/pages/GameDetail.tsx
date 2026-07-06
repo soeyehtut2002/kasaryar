@@ -440,8 +440,11 @@ export const GameDetail: React.FC = () => {
               <div className="bg-slate-50 dark:bg-dark-900 rounded-lg p-4 border border-slate-200 dark:border-dark-800 text-center">
                 <p className="text-xs font-bold text-slate-800 dark:text-white mb-2">Scan to Pay ({selectedPayment})</p>
                 <div className="w-32 h-32 bg-white rounded-lg border-2 border-dashed border-slate-300 dark:border-dark-700 mx-auto mb-3 flex items-center justify-center relative overflow-hidden">
-                   {/* Fallback QR placeholder if specific images aren't provided */}
-                   <span className="text-slate-400 text-[10px] absolute inset-0 flex items-center justify-center text-center p-2">Bank QR Code</span>
+                   {selectedPayment === 'KPay' ? (
+                     <img src="/kpay-qr.png" alt="KPay QR Code" className="w-full h-full object-contain" />
+                   ) : (
+                     <span className="text-slate-400 text-[10px] absolute inset-0 flex items-center justify-center text-center p-2">Bank QR Code<br/>(Coming Soon)</span>
+                   )}
                 </div>
                 
                 <label className="block w-full">
