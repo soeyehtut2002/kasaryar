@@ -6,6 +6,7 @@ import shopRoutes from './routes/shopRoutes';
 import adminRoutes from './routes/adminRoutes';
 import chatRoutes from './routes/chatRoutes';
 import cmsRoutes from './routes/cmsRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 import { errorHandler } from './middleware/error';
 import { AppError } from './utils/appError';
 
@@ -21,12 +22,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve uploads folder statically
+app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', shopRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/cms', cmsRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {

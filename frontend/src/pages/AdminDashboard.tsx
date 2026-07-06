@@ -18,9 +18,11 @@ import {
   AlertCircle,
   MessageSquare,
   Send,
-  LayoutTemplate
+  LayoutTemplate,
+  Upload
 } from 'lucide-react';
 import { AdminCMS } from '../components/admin/AdminCMS';
+import { useFileUpload } from '../hooks/useFileUpload';
 
 interface Order {
   id: string;
@@ -68,6 +70,8 @@ export const AdminDashboard: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const { uploadFile, isUploading } = useFileUpload();
 
   // Support Chat States
   const [chatRooms, setChatRooms] = useState<any[]>([]);
@@ -589,14 +593,26 @@ export const AdminDashboard: React.FC = () => {
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
                       {t('thumbnailUrl')}
                     </label>
-                    <input
-                      type="url"
-                      required
-                      value={gameForm.thumbnailUrl}
-                      onChange={(e) => setGameForm({ ...gameForm, thumbnailUrl: e.target.value })}
-                      placeholder="https://images.unsplash.com/..."
-                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
-                    />
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="url"
+                        required
+                        value={gameForm.thumbnailUrl}
+                        onChange={(e) => setGameForm({ ...gameForm, thumbnailUrl: e.target.value })}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                      />
+                      <label className="cursor-pointer bg-slate-200 dark:bg-dark-800 p-2.5 rounded-xl hover:bg-slate-300 dark:hover:bg-dark-700 flex items-center justify-center">
+                        <Upload size={18} />
+                        <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const url = await uploadFile(file);
+                            if (url) setGameForm({...gameForm, thumbnailUrl: url});
+                          }
+                        }} />
+                      </label>
+                    </div>
                   </div>
                 </div>
 
@@ -604,14 +620,26 @@ export const AdminDashboard: React.FC = () => {
                   <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">
                     {t('bannerUrl')}
                   </label>
-                  <input
-                    type="url"
-                    required
-                    value={gameForm.bannerUrl}
-                    onChange={(e) => setGameForm({ ...gameForm, bannerUrl: e.target.value })}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
-                  />
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="url"
+                      required
+                      value={gameForm.bannerUrl}
+                      onChange={(e) => setGameForm({ ...gameForm, bannerUrl: e.target.value })}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-primary-500 text-xs"
+                    />
+                    <label className="cursor-pointer bg-slate-200 dark:bg-dark-800 p-2.5 rounded-xl hover:bg-slate-300 dark:hover:bg-dark-700 flex items-center justify-center">
+                      <Upload size={18} />
+                      <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const url = await uploadFile(file);
+                          if (url) setGameForm({...gameForm, bannerUrl: url});
+                        }
+                      }} />
+                    </label>
+                  </div>
                 </div>
 
                 <div>
@@ -653,9 +681,10 @@ export const AdminDashboard: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center gap-1.5 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl text-xs cursor-pointer"
+                    disabled={isUploading}
+                    className="flex items-center gap-1.5 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50"
                   >
-                    <Save size={14} /> {isEditingGame ? t('saveChanges') : t('publishGame')}
+                    <Save size={14} /> {isUploading ? 'Uploading...' : (isEditingGame ? t('saveChanges') : t('publishGame'))}
                   </button>
                 </div>
               </form>

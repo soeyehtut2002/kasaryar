@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload } from 'lucide-react';
+import { useFileUpload } from '../../hooks/useFileUpload';
 
 export const AdminCMS: React.FC = () => {
   const { token } = useAuth();
@@ -10,6 +11,8 @@ export const AdminCMS: React.FC = () => {
   
   // Need to fetch packages to assign flash sales
   const [games, setGames] = useState<any[]>([]);
+  
+  const { uploadFile, isUploading } = useFileUpload();
   
   // Load data
   const loadData = async () => {
@@ -124,12 +127,26 @@ export const AdminCMS: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <input required type="text" placeholder="Title" value={bannerForm.title} onChange={e => setBannerForm({...bannerForm, title: e.target.value})} className="p-2 rounded border" />
               <input required type="text" placeholder="Subtitle" value={bannerForm.subtitle} onChange={e => setBannerForm({...bannerForm, subtitle: e.target.value})} className="p-2 rounded border" />
-              <input required type="url" placeholder="Image URL" value={bannerForm.imageUrl} onChange={e => setBannerForm({...bannerForm, imageUrl: e.target.value})} className="p-2 rounded border" />
+              <div className="flex gap-2 items-center">
+                <input required type="url" placeholder="Image URL" value={bannerForm.imageUrl} onChange={e => setBannerForm({...bannerForm, imageUrl: e.target.value})} className="p-2 flex-1 rounded border" />
+                <label className="cursor-pointer bg-slate-200 p-2 rounded hover:bg-slate-300 flex items-center justify-center">
+                  <Upload size={20} />
+                  <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = await uploadFile(file);
+                      if (url) setBannerForm({...bannerForm, imageUrl: url});
+                    }
+                  }} />
+                </label>
+              </div>
               <input required type="text" placeholder="Color Theme classes" value={bannerForm.colorTheme} onChange={e => setBannerForm({...bannerForm, colorTheme: e.target.value})} className="p-2 rounded border" />
             </div>
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setShowBannerForm(false)} className="px-4 py-2 bg-slate-300 rounded">Cancel</button>
-              <button type="submit" className="px-4 py-2 bg-primary-500 text-white rounded">Save</button>
+              <button type="submit" disabled={isUploading} className="px-4 py-2 bg-primary-500 text-white rounded disabled:opacity-50">
+                {isUploading ? 'Uploading...' : 'Save'}
+              </button>
             </div>
           </form>
         )}
@@ -173,11 +190,26 @@ export const AdminCMS: React.FC = () => {
               </select>
               <input required type="number" placeholder="Discount %" value={flashForm.discountPercentage} onChange={e => setFlashForm({...flashForm, discountPercentage: parseInt(e.target.value)})} className="p-2 rounded border" />
               <input required type="datetime-local" value={flashForm.endTime.slice(0,16)} onChange={e => setFlashForm({...flashForm, endTime: new Date(e.target.value).toISOString()})} className="p-2 rounded border" />
-              <input type="url" placeholder="Custom Icon URL (e.g. UC image)" value={flashForm.customIconUrl} onChange={e => setFlashForm({...flashForm, customIconUrl: e.target.value})} className="p-2 rounded border" />
+              
+              <div className="flex gap-2 items-center">
+                <input type="url" placeholder="Custom Icon URL (e.g. UC image)" value={flashForm.customIconUrl} onChange={e => setFlashForm({...flashForm, customIconUrl: e.target.value})} className="p-2 flex-1 rounded border" />
+                <label className="cursor-pointer bg-slate-200 p-2 rounded hover:bg-slate-300 flex items-center justify-center">
+                  <Upload size={20} />
+                  <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = await uploadFile(file);
+                      if (url) setFlashForm({...flashForm, customIconUrl: url});
+                    }
+                  }} />
+                </label>
+              </div>
             </div>
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setShowFlashForm(false)} className="px-4 py-2 bg-slate-300 rounded">Cancel</button>
-              <button type="submit" className="px-4 py-2 bg-accent-500 text-white rounded">Save</button>
+              <button type="submit" disabled={isUploading} className="px-4 py-2 bg-accent-500 text-white rounded disabled:opacity-50">
+                {isUploading ? 'Uploading...' : 'Save'}
+              </button>
             </div>
           </form>
         )}
